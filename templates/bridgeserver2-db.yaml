@@ -37,7 +37,7 @@ Resources:
           - aurora
       DBSubnetGroupName: !ImportValue us-east-1-bridgeserver2-common-db-DBSubnetGroupName
       DeletionProtection: true
-      Engine: 'aurora'
+      Engine: 'aurora-mysql'
       EngineMode: 'provisioned'
       EngineVersion: !Ref MySqlVersion
       MasterUsername: !Ref HibernateConnectionUsername
@@ -46,7 +46,7 @@ Resources:
       PreferredMaintenanceWindow: Mon:10:00-Mon:10:30
       StorageEncrypted: true
       VpcSecurityGroupIds:
-        - !ImportValue us-east-1-BridgeServer2-vpc-VpnSecurityGroup
+        # - !ImportValue us-east-1-BridgeServer2-vpc-VpnSecurityGroup
         - !Ref RdsNewVpcSecurityGroup
   DBInstance:
     Type: AWS::RDS::DBInstance
@@ -60,7 +60,7 @@ Resources:
         - '-'
         - - !Ref 'AWS::StackName'
           - aurora
-      Engine: 'aurora'
+      Engine: 'aurora-mysql'
       PubliclyAccessible: false
   DBInstanceReplica:
     Type: AWS::RDS::DBInstance
@@ -74,7 +74,7 @@ Resources:
         - '-'
         - - !Ref 'AWS::StackName'
           - aurora-replica
-      Engine: 'aurora'
+      Engine: 'aurora-mysql'
       PubliclyAccessible: false
   RdsNewVpcSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
@@ -83,7 +83,7 @@ Resources:
         - '-'
         - - !Ref 'AWS::StackName'
           - RdsNewVpcSecurityGroup
-      VpcId: !ImportValue us-east-1-BridgeServer2-vpc-VPCId
+      VpcId: !ImportValue us-east-1-bridge-vpc-with-subnets-VPC
   RdsNewToNewSecurityGroupIngress:
     Type: 'AWS::EC2::SecurityGroupIngress'
     Properties:

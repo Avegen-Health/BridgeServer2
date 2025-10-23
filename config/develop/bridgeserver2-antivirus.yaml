@@ -1,9 +1,9 @@
 template_path: bridgeserver2-antivirus.yaml
 stack_name: bridgeserver2-antivirus-develop
 parameters:
-  AlarmEmail: bridge-testing@sagebase.org
-  CodeZipS3BucketParameter: org-sagebridge-deployments-devdevelop
+  AlarmEmail: akash.shinde@avegenhealth.com
+  CodeZipS3BucketParameter: org-gvbridge-deployments-devdevelop
   CodeZipS3KeyParameter: virus-scanner-lambda-20230206-af70cfc.zip
-  ScanTriggerSNSTopicArn: arn:aws:sns:us-east-1:420786776710:virus-scan-trigger-devdevelop
+  ScanTriggerSNSTopicArn: arn:aws:sns:us-east-1:433864969993:virus-scan-trigger-devdevelop
   ScanResultSNSTopicArn: arn:aws:sns:us-east-1:420786776710:virus-scan-result-devdevelop
   SumoLogicHttpEndpoint: https://endpoint1.collection.us2.sumologic.com/receiver/v1/http/ZaVnC4dhaV3_l9IQSDo2TMZwf4Vi7CIYTkmWOvLLOBA2W2Mp1KJRDKJCkBGcN6aC0wqiDfGjCdzupyx_klVAW5Rd8-s9iQGMygXKJinF0xc72_I2eGGPqA==

@@ -59,7 +59,7 @@ Resources:
       Role: !GetAtt
         - VirusScanStackInitRole
         - Arn
-      Runtime: python3.7
+      Runtime: python3.8
       Timeout: 100
   CloudWatchTimer:
     Type: 'AWS::Events::Rule'
@@ -113,7 +113,7 @@ Resources:
         - VirusScannerRole
         - Arn
       Timeout: 300
-      Runtime: python3.7
+      Runtime: python3.8
       Handler: scan.lambda_handler
       Environment:
         Variables:
@@ -156,11 +156,12 @@ Resources:
       TreatMissingData: notBreaching
   VirusScannerLambdaErrorMetric:
     Type: "AWS::Logs::MetricFilter"
+    DependsOn:
+      - VirusScannerLambda
     Properties:
       LogGroupName: !Join
         - ''
         - - /aws/lambda/
-          - !Ref VirusScannerLambda
       FilterPattern: 'ERROR -"Not Found" -NoSuchKey -MethodNotAllowed'
       MetricTransformations:
         -
@@ -198,7 +199,7 @@ Resources:
         - VirusDefinitionUpdateRole
         - Arn
       Timeout: 300
-      Runtime: python3.7
+      Runtime: python3.8
       Handler: update.lambda_handler
       Environment:
         Variables:

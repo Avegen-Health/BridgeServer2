@@ -4,9 +4,9 @@ depedencies:
   - common/bridgeserver2-common.yaml
   - develop/bridgeserver2-db.yaml
 parameters:
-  AppDeployBucket: org-sagebridge-bridgeserver2-deployment-devdevelop
+  AppDeployBucket: org-gvbridge-bridgeserver2-deployment-devdevelop
   AppHealthcheckUrl: '/'
-  AttachmentBucket: org-sagebridge-attachment-devdevelop
+  AttachmentBucket: org-gvbridge-attachment-devdevelop
   AwsAutoScalingMaxSize: '1'
   AwsAutoScalingMinSize: '1'
   AwsEbHealthReportingSystem: enhanced

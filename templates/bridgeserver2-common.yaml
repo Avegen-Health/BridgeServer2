@@ -37,20 +37,20 @@ Resources:
             DeleteSourceFromS3: true
             Enabled: true
             MaxAgeInDays: 90
-  SSLCertificate:
-    Type: AWS::CertificateManager::Certificate
-    Properties:
-      DomainName: !Join
-        - '.'
-        - - '*'
-          - !Ref DNSDomainName
-      DomainValidationOptions:
-        - DomainName: !Join
-            - '.'
-            - - '*'
-              - !Ref DNSDomainName
-          ValidationDomain: !Ref DNSDomainName
-      ValidationMethod: DNS
+  # SSLCertificate:
+  #   Type: AWS::CertificateManager::Certificate
+  #   Properties:
+  #     DomainName: !Join
+  #       - '.'
+  #       - - '*'
+  #         - !Ref DNSDomainName
+  #     DomainValidationOptions:
+  #       - DomainName: !Join
+  #           - '.'
+  #           - - '*'
+  #             - !Ref DNSDomainName
+  #         ValidationDomain: !Ref DNSDomainName
+  #     ValidationMethod: DNS
   # KMS Keys
   AWSKmsKey:
     Type: "AWS::KMS::Key"
@@ -128,10 +128,10 @@ Outputs:
     Value: !GetAtt BeanstalkServiceRole.Arn
     Export:
       Name: !Sub '${AWS::Region}-${AWS::StackName}-BeanstalkServiceRoleArn'
-  SSLCertificate:
-    Value: !Ref SSLCertificate
-    Export:
-      Name: !Sub '${AWS::Region}-${AWS::StackName}-SSLCertificate'
+  # SSLCertificate:
+  #   Value: !Ref SSLCertificate
+  #   Export:
+  #     Name: !Sub '${AWS::Region}-${AWS::StackName}-SSLCertificate'
   AWSKmsKey:
     Value: !Ref AWSKmsKey
     Export:
