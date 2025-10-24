@@ -3,4 +3,4 @@ stack_name: bridgeserver2-https-redirect-uat
 depedencies:
   - uat/bridgeserver2.yaml
 parameters:
-  LoadBalancerArn: "arn:aws:elasticloadbalancing:us-east-1:420786776710:loadbalancer/app/awseb-AWSEB-945U6QS9NU6D/7adec35a2101eb3f"
+  LoadBalancerArn: "arn:aws:elasticloadbalancing:us-east-1:433864969993:loadbalancer/app/gv-bridge-uat/60688866d4a341da"

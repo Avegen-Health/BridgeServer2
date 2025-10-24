@@ -4,9 +4,9 @@ depedencies:
   - common/bridgeserver2-common.yaml
   - uat/bridgeserver2-db.yaml
 parameters:
-  AppDeployBucket: org-sagebridge-bridgeserver2-deployment-devstaging
+  AppDeployBucket: org-gvbridge-bridgeserver2-deployment-devstaging
   AppHealthcheckUrl: '/'
-  AttachmentBucket: org-sagebridge-attachment-devstaging
+  AttachmentBucket: org-gvbridge-attachment-devstaging
   AwsAutoScalingMaxSize: '1'
   AwsAutoScalingMinSize: '1'
   AwsEbHealthReportingSystem: enhanced
@@ -24,7 +24,7 @@ parameters:
   EC2InstanceType: t3a.medium
   EmailUnsubscribeToken: !ssm /bridgeserver2-common/EmailUnsubscribeToken
   Env: staging
-  ExporterRequestSqsQueueUrl: https://sqs.us-east-1.amazonaws.com/420786776710/Bridge-EX-Request-staging
+  ExporterRequestSqsQueueUrl: https://sqs.us-east-1.amazonaws.com/433864969993/Bridge-EX-Request-staging
   ExporterSynapseAccessToken: !ssm /bridgeserver2-uat/ExporterSynapseAccessToken
   ExporterSynapseUser: !ssm /bridgeserver2-uat/ExporterSynapseUser
   HibernateConnectionPassword: !ssm /bridgeserver2-uat/HibernateConnectionPassword

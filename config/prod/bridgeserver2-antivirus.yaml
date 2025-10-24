@@ -1,7 +1,7 @@
 template_path: bridgeserver2-antivirus.yaml
 stack_name: bridgeserver2-antivirus-prod
 parameters:
-  AlarmEmail: bridgeops@sagebase.org
+  AlarmEmail: akash.shinde@avegenhealth.com
   CodeZipS3BucketParameter: org-sagebridge-deployments-prod
   CodeZipS3KeyParameter: virus-scanner-lambda-20230206-af70cfc.zip
   ScanTriggerSNSTopicArn: arn:aws:sns:us-east-1:649232250620:virus-scan-trigger-prod
