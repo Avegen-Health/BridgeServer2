@@ -27,9 +27,9 @@ deploy:
   app: BridgeServer2-application
   env: bridgeserver2-$TRAVIS_BRANCH
   bucket:
-    develop: org-sagebridge-bridgeserver2-deployment-devdevelop
-    uat: org-sagebridge-bridgeserver2-deployment-devstaging
-    prod: org-sagebridge-bridgeserver2-deployment-prod
+    develop: org-gvbridge-bridgeserver2-deployment-devdevelop
+    uat: org-gvbridge-bridgeserver2-deployment-devstaging
+    prod: org-gvbridge-bridgeserver2-deployment-prod
   zip-file: target/BridgeServer2-2.1-SNAPSHOT.war
   on:
     all_branches: true
