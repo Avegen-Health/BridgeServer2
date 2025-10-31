@@ -692,7 +692,7 @@ public class SpringConfig {
     public DataSource primaryDataSource() {
         BridgeConfig config = bridgeConfig();
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClass("com.mysql.jdbc.Driver");
+        dataSource.setDriverClass("com.mysql.cj.jdbc.Driver");
         dataSource.setJdbcUrl(databaseURL());
         dataSource.setUser(config.get("hibernate.connection.username"));
         dataSource.setPassword(config.get("hibernate.connection.password"));
@@ -705,7 +705,7 @@ public class SpringConfig {
     public DataSource dataSource() {
         BridgeConfig config = bridgeConfig();
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClass("com.mysql.jdbc.Driver");
+        dataSource.setDriverClass("com.mysql.cj.jdbc.Driver");
         dataSource.setJdbcUrl(databaseURL());
         dataSource.setUser(config.get("hibernate.connection.username"));
         dataSource.setPassword(config.get("hibernate.connection.password"));
