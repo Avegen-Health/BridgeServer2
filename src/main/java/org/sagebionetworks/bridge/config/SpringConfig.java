@@ -5,6 +5,7 @@ import static org.hibernate.event.spi.EventType.DELETE;
 import static org.hibernate.event.spi.EventType.MERGE;
 import static org.hibernate.event.spi.EventType.SAVE_UPDATE;
 
+import java.beans.PropertyVetoException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -40,6 +41,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.mchange.v2.c3p0.DriverManagerDataSource;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -711,8 +713,13 @@ public class SpringConfig {
         }
         
         BridgeConfig config = bridgeConfig();
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClass("com.mysql.cj.jdbc.Driver");
+        ComboPooledDataSource dataSource = new ComboPooledDataSource();
+        try {
+            dataSource.setDriverClass("com.mysql.jdbc.Driver"); //loads the jdbc driver
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();
+            // handle exception
+        }
         dataSource.setJdbcUrl(databaseURL());
         dataSource.setUser(config.get("hibernate.connection.username"));
         dataSource.setPassword(config.get("hibernate.connection.password"));
