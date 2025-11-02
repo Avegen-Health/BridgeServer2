@@ -703,6 +703,13 @@ public class SpringConfig {
     @Profile("default")
     @LiquibaseDataSource
     public DataSource dataSource() {
+        try {
+            // Explicitly load the driver class
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Failed to load MySQL JDBC Driver", e);
+        }
+        
         BridgeConfig config = bridgeConfig();
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClass("com.mysql.cj.jdbc.Driver");
