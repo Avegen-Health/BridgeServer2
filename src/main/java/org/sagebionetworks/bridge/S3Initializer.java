@@ -228,6 +228,7 @@ public class S3Initializer {
             // Add SNS notification for virus scan, if needed.
             if (bucketsVirusScanEnabled.contains(propName)) {
                 // Get old bucket configuration.
+                LOG.info("Getting bucket notification configuration " + bucketName);
                 BucketNotificationConfiguration bucketConfig = s3Client.getBucketNotificationConfiguration(bucketName);
                 boolean updated = false;
 
