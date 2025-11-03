@@ -715,7 +715,7 @@ public class SpringConfig {
         BridgeConfig config = bridgeConfig();
         ComboPooledDataSource dataSource = new ComboPooledDataSource();
         try {
-            dataSource.setDriverClass("com.mysql.jdbc.Driver"); //loads the jdbc driver
+            dataSource.setDriverClass("com.mysql.cj.jdbc.Driver"); //loads the jdbc driver
         } catch (PropertyVetoException e) {
             e.printStackTrace();
             // handle exception
