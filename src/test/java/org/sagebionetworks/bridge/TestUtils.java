@@ -558,14 +558,14 @@ public class TestUtils {
         app.setIdentifier(id);
         app.setMinAgeOfConsent(18);
         app.setSponsorName("The Council on Test Studies");
-        app.setConsentNotificationEmail("bridge-testing+consent@sagebase.org");
+        app.setConsentNotificationEmail("akash.shinde@avegenhealth.com");
         app.setConsentNotificationEmailVerified(true);
         app.setSynapseDataAccessTeamId(1234L);
         app.setSynapseProjectId("test-synapse-project-id");
-        app.setTechnicalEmail("bridge-testing+technical@sagebase.org");
+        app.setTechnicalEmail("akash.shinde@avegenhealth.com");
         app.setUploadValidationStrictness(UploadValidationStrictness.REPORT);
         app.setUsesCustomExportSchedule(true);
-        app.setSupportEmail("bridge-testing+support@sagebase.org");
+        app.setSupportEmail("akash.shinde@avegenhealth.com");
         app.setUserProfileAttributes(Sets.newHashSet("a", "b"));
         app.setTaskIdentifiers(Sets.newHashSet("task1", "task2"));
         app.setActivityEventKeys(Sets.newHashSet("event1", "event2"));

@@ -266,9 +266,9 @@ public class ConsentServiceTest extends Mockito {
         assertEquals(tokenMap.get("appName"), "Test App [ConsentServiceTest]");
         assertEquals(tokenMap.get("sponsorName"), "The Council on Test Studies");
         assertEquals(tokenMap.get("appShortName"), "ShortName");
-        assertEquals(tokenMap.get("supportEmail"), "bridge-testing+support@sagebase.org");
-        assertEquals(tokenMap.get("technicalEmail"), "bridge-testing+technical@sagebase.org");
-        assertEquals(tokenMap.get("consentEmail"), "bridge-testing+consent@sagebase.org");
+        assertEquals(tokenMap.get("supportEmail"), "akash.shinde@avegenhealth.com");
+        assertEquals(tokenMap.get("technicalEmail"), "akash.shinde@avegenhealth.com");
+        assertEquals(tokenMap.get("consentEmail"), "akash.shinde@avegenhealth.com");
         assertEquals(tokenMap.get("studyShortName"), "ShortName");
         assertEquals(tokenMap.get("appId"), app.getIdentifier());
         assertEquals(tokenMap.get("studyId"), app.getIdentifier());
@@ -297,9 +297,9 @@ public class ConsentServiceTest extends Mockito {
         assertEquals(tokenMap.get("appName"), "Test App [ConsentServiceTest]");
         assertEquals(tokenMap.get("sponsorName"), "The Council on Test Studies");
         assertEquals(tokenMap.get("appShortName"), "ShortName");
-        assertEquals(tokenMap.get("supportEmail"), "bridge-testing+support@sagebase.org");
-        assertEquals(tokenMap.get("technicalEmail"), "bridge-testing+technical@sagebase.org");
-        assertEquals(tokenMap.get("consentEmail"), "bridge-testing+consent@sagebase.org");
+        assertEquals(tokenMap.get("supportEmail"), "akash.shinde@avegenhealth.com");
+        assertEquals(tokenMap.get("technicalEmail"), "akash.shinde@avegenhealth.com");
+        assertEquals(tokenMap.get("consentEmail"), "akash.shinde@avegenhealth.com");
         assertEquals(tokenMap.get("studyShortName"), "ShortName");
         assertEquals(tokenMap.get("appId"), app.getIdentifier());
         assertEquals(tokenMap.get("studyId"), app.getIdentifier());
@@ -398,8 +398,8 @@ public class ConsentServiceTest extends Mockito {
         MimeTypeEmail email = provider.getMimeTypeEmail();
 
         assertEquals(email.getSenderAddress(),
-                "\"Test App [ConsentServiceTest]\" <bridge-testing+support@sagebase.org>");
-        assertEquals(email.getRecipientAddresses().get(0), "bridge-testing+consent@sagebase.org");
+                "\"Test App [ConsentServiceTest]\" <akash.shinde@avegenhealth.com>");
+        assertEquals(email.getRecipientAddresses().get(0), "akash.shinde@avegenhealth.com");
         assertEquals(email.getSubject(), "Notification of consent withdrawal for Test App [ConsentServiceTest]");
         assertEquals(email.getMessageParts().get(0).getContent(), "<p>User   &lt;" + EMAIL
                 + "&gt; withdrew from the study on October 28, 2015. </p><p>Reason:</p><p>For reasons.</p>");
@@ -463,8 +463,8 @@ public class ConsentServiceTest extends Mockito {
         MimeTypeEmail email = provider.getMimeTypeEmail();
 
         assertEquals(email.getSenderAddress(),
-                "\"Test App [ConsentServiceTest]\" <bridge-testing+support@sagebase.org>");
-        assertEquals(email.getRecipientAddresses().get(0), "bridge-testing+consent@sagebase.org");
+                "\"Test App [ConsentServiceTest]\" <akash.shinde@avegenhealth.com>");
+        assertEquals(email.getRecipientAddresses().get(0), "akash.shinde@avegenhealth.com");
         assertEquals(email.getSubject(), "Notification of consent withdrawal for Test App [ConsentServiceTest]");
         assertEquals(email.getMessageParts().get(0).getContent(), "<p>User Allen Wrench &lt;" + EMAIL
                 + "&gt; withdrew from the study on October 28, 2015. </p><p>Reason:</p><p>For reasons.</p>");
@@ -905,9 +905,9 @@ public class ConsentServiceTest extends Mockito {
         MimeTypeEmail email = provider.getMimeTypeEmail();
         assertEquals(email.getSubject(), "signedConsent subject");
         assertEquals(email.getSenderAddress(),
-                "\"Test App [ConsentServiceTest]\" <bridge-testing+support@sagebase.org>");
+                "\"Test App [ConsentServiceTest]\" <akash.shinde@avegenhealth.com>");
         assertEquals(Sets.newHashSet(email.getRecipientAddresses()),
-                Sets.newHashSet("email@email.com", "bridge-testing+consent@sagebase.org"));
+                Sets.newHashSet("email@email.com", "akash.shinde@avegenhealth.com"));
     }
 
     @Test
