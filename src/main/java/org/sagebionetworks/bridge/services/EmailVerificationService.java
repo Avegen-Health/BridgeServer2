@@ -106,9 +106,12 @@ public class EmailVerificationService {
     
     public boolean isVerified(String emailAddress) {
         CacheKey key = CacheKey.emailVerification(emailAddress);
+        LOG.info(String.format("Checking email verification for %s", emailAddress));
         String value = cacheProvider.getObject(key, String.class);
+        LOG.info(String.format("Email verification for %s is %s", emailAddress, value));
         if (value == null) {
             EmailVerificationStatus status = getEmailStatus(emailAddress);
+            LOG.info(String.format("Email verification status for %s is %s", emailAddress, status));
             value = cacheAndReturn(emailAddress, status).name();
         }
         return "VERIFIED".equals(value);
@@ -121,7 +124,6 @@ public class EmailVerificationService {
                 .withIdentities(emailAddress);
 
         GetIdentityVerificationAttributesResult result = sesClient.getIdentityVerificationAttributes(request);
-        
         // didn't happen in testing against SES, but just to be paranoid.
         Map<String,IdentityVerificationAttributes> attributeMap = result.getVerificationAttributes();
         if (attributeMap == null) {
