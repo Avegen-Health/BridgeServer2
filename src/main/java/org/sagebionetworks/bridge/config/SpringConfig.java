@@ -52,8 +52,11 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
+import org.sagebionetworks.bridge.async.AsyncHandler;
 import org.sagebionetworks.bridge.dynamodb.DynamoHealthDataDocumentation;
 import org.sagebionetworks.bridge.dynamodb.DynamoParticipantFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -172,7 +175,8 @@ import redis.clients.jedis.JedisPoolConfig;
 @ComponentScan("org.sagebionetworks.bridge")
 @Configuration
 public class SpringConfig {
-    
+
+    private static final Logger LOG = LoggerFactory.getLogger(SpringConfig.class);
     @Bean
     public HeartbeatLogger heartbeatLogger() {
         HeartbeatLogger heartbeatLogger = new HeartbeatLogger();
@@ -771,7 +775,7 @@ public class SpringConfig {
     @Bean(name="bridgePFSynapseClient")
     public SynapseClient synapseClient() {
         Config config = bridgeConfig();
-
+        LOG.info("Synapse TKN : %s", config.get("synapse.access.token"));
         SynapseClient synapseClient = new SynapseAdminClientImpl();
         synapseClient.setBearerAuthorizationToken(config.get("synapse.access.token"));
         setSynapseEndpoint(synapseClient, config);
