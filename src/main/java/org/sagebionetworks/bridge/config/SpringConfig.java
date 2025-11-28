@@ -785,7 +785,7 @@ public class SpringConfig {
     @Bean(name="exporterSynapseClient")
     public SynapseClient exporterSynapseClient() {
         Config config = bridgeConfig();
-        LOG.info("Exporter Synapse TKN : %s", config.get("synapse.access.token"));
+        LOG.info("Exporter Synapse TKN : %s", config.get("exporter.synapse.access.token"));
         SynapseClient synapseClient = new SynapseAdminClientImpl();
         synapseClient.setBearerAuthorizationToken(config.get("exporter.synapse.access.token"));
         setSynapseEndpoint(synapseClient, config);
