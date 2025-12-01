@@ -553,6 +553,8 @@ public class Exporter3Service {
             LOG.info("Created Synapse project " + projectId);
 
             // Create ACLs for project.
+            LOG.info("Project Admin IDs " + projectAdminIds);
+            LOG.info("Project Read only IDs " + projectReadOnlyIds);
             synapseHelper.createAclWithRetry(projectId, projectAdminIds, projectReadOnlyIds);
 
             ex3Config.setProjectId(projectId);
