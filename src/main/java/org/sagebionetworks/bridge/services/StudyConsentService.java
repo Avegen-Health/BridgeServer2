@@ -351,6 +351,7 @@ public class StudyConsentService {
             PutObjectRequest request = new PutObjectRequest(bucket, key, dataInputStream, metadata)
                     .withCannedAcl(CannedAccessControlList.PublicRead);
 
+            logger.info("Started writing to bucket " + bucket + " key " + key);
             Stopwatch stopwatch = Stopwatch.createStarted();
             s3Client.putObject(request);
             logger.info("Finished writing to bucket " + bucket + " key " + key + " (" + data.length + " bytes) in " +

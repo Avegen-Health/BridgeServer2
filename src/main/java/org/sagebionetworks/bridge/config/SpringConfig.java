@@ -5,6 +5,7 @@ import static org.hibernate.event.spi.EventType.DELETE;
 import static org.hibernate.event.spi.EventType.MERGE;
 import static org.hibernate.event.spi.EventType.SAVE_UPDATE;
 
+import java.beans.PropertyVetoException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
@@ -40,6 +41,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 import com.mchange.v2.c3p0.DriverManagerDataSource;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -50,8 +52,11 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.service.spi.ServiceRegistryImplementor;
+import org.sagebionetworks.bridge.async.AsyncHandler;
 import org.sagebionetworks.bridge.dynamodb.DynamoHealthDataDocumentation;
 import org.sagebionetworks.bridge.dynamodb.DynamoParticipantFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseDataSource;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -170,7 +175,8 @@ import redis.clients.jedis.JedisPoolConfig;
 @ComponentScan("org.sagebionetworks.bridge")
 @Configuration
 public class SpringConfig {
-    
+
+    private static final Logger LOG = LoggerFactory.getLogger(SpringConfig.class);
     @Bean
     public HeartbeatLogger heartbeatLogger() {
         HeartbeatLogger heartbeatLogger = new HeartbeatLogger();
@@ -596,7 +602,7 @@ public class SpringConfig {
         String url = config.get("hibernate.connection.url");
         // Append SSL props to URL
         boolean useSsl = Boolean.valueOf(config.get("hibernate.connection.useSSL"));
-        url += "?rewriteBatchedStatements=true&serverTimezone=UTC&requireSSL="+useSsl+"&useSSL="+useSsl+"&verifyServerCertificate="+useSsl;
+        url += "?rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&requireSSL="+useSsl+"&useSSL="+useSsl+"&verifyServerCertificate="+useSsl;
         
         return url;
     }
@@ -692,7 +698,7 @@ public class SpringConfig {
     public DataSource primaryDataSource() {
         BridgeConfig config = bridgeConfig();
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClass("com.mysql.jdbc.Driver");
+        dataSource.setDriverClass("com.mysql.cj.jdbc.Driver");
         dataSource.setJdbcUrl(databaseURL());
         dataSource.setUser(config.get("hibernate.connection.username"));
         dataSource.setPassword(config.get("hibernate.connection.password"));
@@ -703,9 +709,21 @@ public class SpringConfig {
     @Profile("default")
     @LiquibaseDataSource
     public DataSource dataSource() {
+        try {
+            // Explicitly load the driver class
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Failed to load MySQL JDBC Driver", e);
+        }
+        
         BridgeConfig config = bridgeConfig();
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClass("com.mysql.jdbc.Driver");
+        ComboPooledDataSource dataSource = new ComboPooledDataSource();
+        try {
+            dataSource.setDriverClass("com.mysql.cj.jdbc.Driver"); //loads the jdbc driver
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();
+            // handle exception
+        }
         dataSource.setJdbcUrl(databaseURL());
         dataSource.setUser(config.get("hibernate.connection.username"));
         dataSource.setPassword(config.get("hibernate.connection.password"));
@@ -757,7 +775,7 @@ public class SpringConfig {
     @Bean(name="bridgePFSynapseClient")
     public SynapseClient synapseClient() {
         Config config = bridgeConfig();
-
+        LOG.info("Synapse TKN : %s", config.get("synapse.access.token"));
         SynapseClient synapseClient = new SynapseAdminClientImpl();
         synapseClient.setBearerAuthorizationToken(config.get("synapse.access.token"));
         setSynapseEndpoint(synapseClient, config);
@@ -767,7 +785,7 @@ public class SpringConfig {
     @Bean(name="exporterSynapseClient")
     public SynapseClient exporterSynapseClient() {
         Config config = bridgeConfig();
-
+        LOG.info("Exporter Synapse TKN : %s", config.get("exporter.synapse.access.token"));
         SynapseClient synapseClient = new SynapseAdminClientImpl();
         synapseClient.setBearerAuthorizationToken(config.get("exporter.synapse.access.token"));
         setSynapseEndpoint(synapseClient, config);

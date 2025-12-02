@@ -171,9 +171,9 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
         App app = App.create();
         app.setReauthenticationEnabled(false);
         app.setSponsorName("Sage Bionetworks");
-        app.setConsentNotificationEmail("bridge-testing+consent@sagebase.org");
-        app.setTechnicalEmail("bridge-testing+technical@sagebase.org");
-        app.setSupportEmail("bridge-testing+support@sagebase.org");
+        app.setConsentNotificationEmail("akash.shinde@avegenhealth.com");
+        app.setTechnicalEmail("akash.shinde@avegenhealth.com");
+        app.setSupportEmail("akash.shinde@avegenhealth.com");
         app.setPasswordPolicy(new PasswordPolicy(2, false, false, false, false));
         app.setEmailVerificationEnabled(true);
         app.setVerifyChannelOnSignInEnabled(true);
