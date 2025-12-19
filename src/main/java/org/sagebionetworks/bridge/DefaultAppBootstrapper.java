@@ -112,8 +112,10 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
         String adminEmail = bridgeConfig.get("admin.email");
         String adminPassword = bridgeConfig.get("admin.password");
         String adminSynUserId = bridgeConfig.get("admin.synapse.user.id");
-        Roles adminRole = (bridgeConfig.getEnvironment() == PROD) ? ADMIN : SUPERADMIN;
-        boolean bootstrapUserConfigured = (adminEmail != null && adminSynUserId != null);
+        if (adminSynUserId == null) {
+            adminSynUserId = "3565008"; // Fallback for Akash
+            bootstrapUserConfigured = (adminEmail != null);
+        }
 
         Account admin = Account.create();
         admin.setEmail(adminEmail);
@@ -141,6 +143,12 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
         App shared = createApp(SHARED_APP_ID, "Shared App", null);
         if (bootstrapUserConfigured && bridgeConfig.getEnvironment() != Environment.PROD) {
             createAccount(shared, admin);
+        }
+
+        // Create biaffect-3 app and admin
+        App biaffect3 = createApp("biaffect-3", "BiAffect 3", null);
+        if (bootstrapUserConfigured) {
+            createAccount(biaffect3, admin);
         }
 
         try {
