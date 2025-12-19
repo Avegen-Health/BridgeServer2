@@ -16,7 +16,8 @@ public class BridgeConfig implements Config {
 
     private static final String CONSENTS_BUCKET = "consents.bucket";
 
-    // Property for a token that is checked before user is unsubscribed from further emails
+    // Property for a token that is checked before user is unsubscribed from further
+    // emails
     private static final String EMAIL_UNSUBSCRIBE_TOKEN = "email.unsubscribe.token";
 
     private static final String HOST_POSTFIX = "host.postfix";
@@ -52,11 +53,37 @@ public class BridgeConfig implements Config {
 
     @Override
     public Environment getEnvironment() {
+        String env = get("bridge.env");
+        if (env != null) {
+            try {
+                Environment e = Environment.valueOf(env.toUpperCase());
+                System.out.println("BridgeConfig: bridge.env resolved to " + env + ", setting Environment=" + e);
+                return e;
+            } catch (IllegalArgumentException e) {
+                System.out.println("BridgeConfig: Invalid bridge.env value: " + env);
+            }
+        } else {
+            System.out.println("BridgeConfig: bridge.env NOT FOUND in System.getenv or file, defaulting to: "
+                    + config.getEnvironment());
+        }
         return config.getEnvironment();
     }
 
     @Override
     public String get(String key) {
+        // Try exact match
+        String env = System.getenv(key);
+        if (env != null && !env.isEmpty()) {
+            return env;
+        }
+        // Try UPPER_SNAKE_CASE (e.g. hibernate.connection.password ->
+        // HIBERNATE_CONNECTION_PASSWORD)
+        String upperKey = key.toUpperCase().replace('.', '_');
+        env = System.getenv(upperKey);
+        if (env != null && !env.isEmpty()) {
+            return env;
+        }
+
         return config.get(key);
     }
 
@@ -67,6 +94,14 @@ public class BridgeConfig implements Config {
 
     @Override
     public int getInt(String key) {
+        String val = get(key);
+        if (val != null) {
+            try {
+                return Integer.parseInt(val);
+            } catch (NumberFormatException e) {
+                // Fallthrough to config
+            }
+        }
         return config.getInt(key);
     }
 

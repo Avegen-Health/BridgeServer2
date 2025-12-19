@@ -346,6 +346,11 @@
                             <targetPath>.ebextensions</targetPath>
                             <filtering>true</filtering>
                         </resource>
+                        <resource>
+                            <directory>.platform</directory>
+                            <targetPath>.platform</targetPath>
+                            <filtering>true</filtering>
+                        </resource>
                     </webResources>
                 </configuration>
             </plugin>

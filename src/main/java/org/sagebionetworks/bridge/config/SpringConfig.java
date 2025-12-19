@@ -177,16 +177,18 @@ import redis.clients.jedis.JedisPoolConfig;
 public class SpringConfig {
 
     private static final Logger LOG = LoggerFactory.getLogger(SpringConfig.class);
+
     @Bean
     public HeartbeatLogger heartbeatLogger() {
         HeartbeatLogger heartbeatLogger = new HeartbeatLogger();
         heartbeatLogger.setIntervalMinutes(bridgeConfig().getInt("heartbeat.interval.minutes"));
         return heartbeatLogger;
     }
-    
-    // Filters. The filters themselves are registered with @Component, but must also be mapped here with a
-    // FilterRegistrationBean to a specific URL. 
-    
+
+    // Filters. The filters themselves are registered with @Component, but must also
+    // be mapped here with a
+    // FilterRegistrationBean to a specific URL.
+
     private <T extends Filter> FilterRegistrationBean<T> filterRegistration(T filter) {
         FilterRegistrationBean<T> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(filter);
@@ -212,9 +214,10 @@ public class SpringConfig {
         return filterRegistration(filter);
     }
 
-    // This will replace Spring Boot's default configuration using Jackson2ObjectMapperBuilder.
+    // This will replace Spring Boot's default configuration using
+    // Jackson2ObjectMapperBuilder.
     // See: https://docs.spring.io/spring-boot/docs/current-SNAPSHOT/reference
-    //      /html/howto.html#howto-customize-the-jackson-objectmapper
+    // /html/howto.html#howto-customize-the-jackson-objectmapper
     @Bean(name = "bridgeObjectMapper")
     @Primary
     public ObjectMapper bridgeObjectMapper() {
@@ -236,11 +239,11 @@ public class SpringConfig {
         int maxRetries = bridgeConfig().getPropertyAsInt("ddb.max.retries");
         ClientConfiguration awsClientConfig = PredefinedClientConfigurations.dynamoDefault()
                 .withMaxErrorRetry(maxRetries);
-        
+
         return AmazonDynamoDBClientBuilder.standard()
                 .withClientConfiguration(awsClientConfig).withRegion(US_EAST_1).build();
     }
-    
+
     @Bean(name = "snsClient")
     public AmazonSNS snsClient() {
         return AmazonSNSClientBuilder.standard()
@@ -253,15 +256,17 @@ public class SpringConfig {
         return AmazonS3ClientBuilder.standard().withRegion(US_EAST_1).build();
     }
 
-    // This client needs to be configured to handle S3 file paths differently, so we can use bucket
-    // names with periods in them (and we need these in turn so they can be fronted with CloudFront).
+    // This client needs to be configured to handle S3 file paths differently, so we
+    // can use bucket
+    // names with periods in them (and we need these in turn so they can be fronted
+    // with CloudFront).
     @Bean(name = "fileUploadS3Client")
     public AmazonS3 fileUploadS3Client() {
         return AmazonS3ClientBuilder.standard().withPathStyleAccessEnabled(true).withRegion(US_EAST_1)
                 .build();
     }
-    
-    @Bean(name ="uploadTokenServiceClient")
+
+    @Bean(name = "uploadTokenServiceClient")
     public AWSSecurityTokenService uploadTokenServiceClient() {
         return AWSSecurityTokenServiceClientBuilder.standard().withRegion(US_EAST_1)
                 .build();
@@ -333,7 +338,7 @@ public class SpringConfig {
     public DynamoDBMapper healthCodeDdbMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoHealthCode.class);
     }
-    
+
     @Bean(name = "compoundActivityDefinitionDdbMapper")
     @Autowired
     public DynamoDBMapper compoundActivityDefinitionDdbMapper(DynamoUtils dynamoUtils) {
@@ -363,13 +368,13 @@ public class SpringConfig {
     public DynamoDBMapper participantDataMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper((DynamoParticipantData.class));
     }
-    
+
     @Bean(name = "reportIndexMapper")
     @Autowired
     public DynamoDBMapper reportIndexMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoReportIndex.class);
     }
-    
+
     @Bean(name = "healthDataDdbMapper")
     @Autowired
     public DynamoDBMapper healthDataDdbMapper(DynamoUtils dynamoUtils) {
@@ -405,13 +410,13 @@ public class SpringConfig {
     public DynamoDBMapper subpopulationDdbMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoSubpopulation.class);
     }
-    
+
     @Bean(name = "appConfigDdbMapper")
     @Autowired
     public DynamoDBMapper appConfigDdbMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoAppConfig.class);
     }
-    
+
     @Bean(name = "appConfigElementDdbMapper")
     @Autowired
     public DynamoDBMapper appConfigElementDdbMapper(DynamoUtils dynamoUtils) {
@@ -423,7 +428,7 @@ public class SpringConfig {
     public DynamoDBMapper demographicValidationDdbMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoDemographicValuesValidationConfig.class);
     }
-    
+
     @Bean(name = "surveyMapper")
     @Autowired
     public DynamoDBMapper surveyDdbMapper(DynamoUtils dynamoUtils) {
@@ -441,95 +446,101 @@ public class SpringConfig {
     public DynamoDBMapper criteriaMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoCriteria.class);
     }
-    
+
     @Bean(name = "schedulePlanMapper")
     @Autowired
     public DynamoDBMapper schedulePlanMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoSchedulePlan.class);
     }
-    
+
     @Bean(name = "masterSchedulerConfigMapper")
     @Autowired
     public DynamoDBMapper masterSchedulerConfigMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoMasterSchedulerConfig.class);
     }
-    
+
     @Bean(name = "masterSchedulerStatusMapper")
     @Autowired
     public DynamoDBMapper masterSchedulerStatusMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoMasterSchedulerStatus.class);
     }
-    
+
     @Bean(name = "notificationRegistrationMapper")
     @Autowired
     public DynamoDBMapper notificationRegistrationMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoNotificationRegistration.class);
     }
-    
+
     @Bean(name = "notificationTopicMapper")
     @Autowired
     public DynamoDBMapper notificationTopicMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoNotificationTopic.class);
     }
-    
+
     @Bean(name = "topicSubscriptionMapper")
     @Autowired
     public DynamoDBMapper topicSubscriptionMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoTopicSubscription.class);
     }
-    
+
     @Bean(name = "oauthAccessGrantMapper")
     @Autowired
     public DynamoDBMapper oauthAccessGrantMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoOAuthAccessGrant.class);
     }
-    
+
     @Bean(name = "uploadHealthCodeRequestedOnIndex")
     @Autowired
     public DynamoIndexHelper uploadHealthCodeRequestedOnIndex(AmazonDynamoDB dynamoDBClient, DynamoUtils dynamoUtils,
             DynamoNamingHelper dynamoNamingHelper) {
-        return DynamoIndexHelper.create(DynamoUpload2.class, "healthCode-requestedOn-index", dynamoDBClient, dynamoNamingHelper, dynamoUtils);
+        return DynamoIndexHelper.create(DynamoUpload2.class, "healthCode-requestedOn-index", dynamoDBClient,
+                dynamoNamingHelper, dynamoUtils);
     }
-    
+
     @Bean(name = "healthCodeActivityGuidIndex")
     @Autowired
     public DynamoIndexHelper healthCodeActivityGuidIndex(AmazonDynamoDB dynamoDBClient, DynamoUtils dynamoUtils,
             DynamoNamingHelper dynamoNamingHelper) {
-        return DynamoIndexHelper.create(DynamoScheduledActivity.class, "healthCodeActivityGuid-scheduledOnUTC-index", dynamoDBClient, dynamoNamingHelper, dynamoUtils);
+        return DynamoIndexHelper.create(DynamoScheduledActivity.class, "healthCodeActivityGuid-scheduledOnUTC-index",
+                dynamoDBClient, dynamoNamingHelper, dynamoUtils);
     }
-    
+
     @Bean(name = "uploadStudyIdRequestedOnIndex")
     @Autowired
     public DynamoIndexHelper uploadStudyIdRequestedOnIndex(AmazonDynamoDB dynamoDBClient, DynamoUtils dynamoUtils,
             DynamoNamingHelper dynamoNamingHelper) {
-        return DynamoIndexHelper.create(DynamoUpload2.class, "studyId-requestedOn-index", dynamoDBClient, dynamoNamingHelper, dynamoUtils);
+        return DynamoIndexHelper.create(DynamoUpload2.class, "studyId-requestedOn-index", dynamoDBClient,
+                dynamoNamingHelper, dynamoUtils);
     }
 
     @Bean(name = "healthDataHealthCodeCreatedOnIndex")
     @Autowired
     public DynamoIndexHelper healthDataHealthCodeCreatedOnIndex(AmazonDynamoDB dynamoDBClient,
-                                                       DynamoUtils dynamoUtils,
-                                                       DynamoNamingHelper dynamoNamingHelper) {
-        return DynamoIndexHelper.create(DynamoHealthDataRecord.class, "healthCode-createdOn-index", dynamoDBClient, dynamoNamingHelper, dynamoUtils);
+            DynamoUtils dynamoUtils,
+            DynamoNamingHelper dynamoNamingHelper) {
+        return DynamoIndexHelper.create(DynamoHealthDataRecord.class, "healthCode-createdOn-index", dynamoDBClient,
+                dynamoNamingHelper, dynamoUtils);
     }
 
     @Bean(name = "healthDataUploadDateIndex")
     @Autowired
     public DynamoIndexHelper healthDataUploadDateIndexDynamoUtils(AmazonDynamoDB dynamoDBClient,
-                                                                  DynamoUtils dynamoUtils,
-                                                                  DynamoNamingHelper dynamoNamingHelper) {
-        return DynamoIndexHelper.create(DynamoHealthDataRecord.class, "uploadDate-index", dynamoDBClient, dynamoNamingHelper, dynamoUtils);
+            DynamoUtils dynamoUtils,
+            DynamoNamingHelper dynamoNamingHelper) {
+        return DynamoIndexHelper.create(DynamoHealthDataRecord.class, "uploadDate-index", dynamoDBClient,
+                dynamoNamingHelper, dynamoUtils);
     }
-    
+
     @Bean(name = "activitySchedulePlanGuidIndex")
     @Autowired
     public DynamoIndexHelper activitySchedulePlanGuidIndex(AmazonDynamoDB dynamoDBClient,
-                                                           DynamoUtils dynamoUtils,
-                                                           DynamoNamingHelper dynamoNamingHelper) {
+            DynamoUtils dynamoUtils,
+            DynamoNamingHelper dynamoNamingHelper) {
         return DynamoIndexHelper
-                .create(DynamoScheduledActivity.class, "schedulePlanGuid-index", dynamoDBClient, dynamoNamingHelper, dynamoUtils);
+                .create(DynamoScheduledActivity.class, "schedulePlanGuid-index", dynamoDBClient, dynamoNamingHelper,
+                        dynamoUtils);
     }
-    
+
     @Bean(name = "healthCodeReferentGuidIndex")
     @Autowired
     public DynamoIndexHelper healthCodeReferentGuidIndex(AmazonDynamoDB dynamoDBClient, DynamoUtils dynamoUtils,
@@ -548,13 +559,13 @@ public class SpringConfig {
     public DynamoDBMapper uploadDedupeDdbMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoUploadDedupe.class);
     }
-    
+
     @Bean(name = "fphsExternalIdDdbMapper")
     @Autowired
     public DynamoDBMapper fphsExternalIdDdbMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoFPHSExternalIdentifier.class);
     }
-    
+
     @Bean(name = "externalIdDdbMapper")
     @Autowired
     public DynamoDBMapper externalIdDdbMapper(DynamoUtils dynamoUtils) {
@@ -566,7 +577,7 @@ public class SpringConfig {
     public DynamoDBMapper participantFileDdbMapper(DynamoUtils dynamoUtils) {
         return dynamoUtils.getMapper(DynamoParticipantFile.class);
     }
-    
+
     @Bean(name = "uploadValidationHandlerList")
     @Autowired
     public List<UploadValidationHandler> uploadValidationHandlerList(S3DownloadHandler s3DownloadHandler,
@@ -595,15 +606,16 @@ public class SpringConfig {
     public FileHelper fileHelper() {
         return new FileHelper();
     }
-    
+
     private String databaseURL() {
         BridgeConfig config = bridgeConfig();
-        
+
         String url = config.get("hibernate.connection.url");
         // Append SSL props to URL
         boolean useSsl = Boolean.valueOf(config.get("hibernate.connection.useSSL"));
-        url += "?rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&requireSSL="+useSsl+"&useSSL="+useSsl+"&verifyServerCertificate="+useSsl;
-        
+        url += "?rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&serverTimezone=UTC&requireSSL=" + useSsl
+                + "&useSSL=" + useSsl + "&verifyServerCertificate=" + useSsl;
+
         return url;
     }
 
@@ -612,8 +624,10 @@ public class SpringConfig {
     public SessionFactory hibernateSessionFactory(TagEventListener listener) {
         ClassLoader classLoader = getClass().getClassLoader();
 
-        // Need to set env vars to find the truststore so we can validate Amazon's RDS SSL certificate. Note that
-        // because this truststore only contains public certs (CA certs and Amazon's RDS certs), we can include the
+        // Need to set env vars to find the truststore so we can validate Amazon's RDS
+        // SSL certificate. Note that
+        // because this truststore only contains public certs (CA certs and Amazon's RDS
+        // certs), we can include the
         // truststore in our source repo and set the password to something public.
         //
         // For more information, see
@@ -622,7 +636,7 @@ public class SpringConfig {
         Path trustStorePath = null;
         try {
             trustStorePath = Paths.get(classLoader.getResource("truststore.jks").toURI());
-        } catch (URISyntaxException ex/*IOException ex*/) {
+        } catch (URISyntaxException ex/* IOException ex */) {
             throw new RuntimeException("Error loading truststore from classpath: " + ex.getMessage(), ex);
         }
         System.setProperty("javax.net.ssl.trustStore", trustStorePath.toString());
@@ -633,6 +647,7 @@ public class SpringConfig {
         props.put("hibernate.connection.characterEncoding", "UTF-8");
         props.put("hibernate.connection.CharSet", "UTF-8");
         props.put("hibernate.connection.useUnicode", true);
+        props.put("hibernate.connection.driver_class", "com.mysql.cj.jdbc.Driver");
         props.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
 
         // c3p0 connection pool properties
@@ -643,13 +658,30 @@ public class SpringConfig {
 
         // Connection properties come from Bridge configs
         BridgeConfig config = bridgeConfig();
-        props.put("hibernate.connection.password", config.get("hibernate.connection.password"));
-        props.put("hibernate.connection.username", config.get("hibernate.connection.username"));
-        props.put("hibernate.connection.url", databaseURL());
+
+        // Prioritize environment variables for credentials if available
+        String password = System.getenv("hibernate.connection.password");
+        if (password == null || password.isEmpty()) {
+            password = config.get("hibernate.connection.password");
+        }
+        props.put("hibernate.connection.password", password);
+
+        String username = System.getenv("hibernate.connection.username");
+        if (username == null || username.isEmpty()) {
+            username = config.get("hibernate.connection.username");
+        }
+        props.put("hibernate.connection.username", username);
+
+        String url = System.getenv("hibernate.connection.url");
+        if (url == null || url.isEmpty()) {
+            url = databaseURL();
+        }
+        props.put("hibernate.connection.url", url);
 
         StandardServiceRegistry reg = new StandardServiceRegistryBuilder().applySettings(props).build();
-        
-        // For whatever reason, we need to list each Hibernate-enabled class individually.
+
+        // For whatever reason, we need to list each Hibernate-enabled class
+        // individually.
         MetadataSources metadataSources = new MetadataSources(reg);
         metadataSources.addAnnotatedClass(HibernateAccount.class);
         metadataSources.addAnnotatedClass(HibernateStudy.class);
@@ -680,57 +712,77 @@ public class SpringConfig {
         metadataSources.addAnnotatedClass(DemographicUser.class);
         metadataSources.addAnnotatedClass(DemographicValue.class);
         metadataSources.addAnnotatedClass(Alert.class);
-        
+
         SessionFactory factory = metadataSources.buildMetadata().buildSessionFactory();
-        
-        // I could not find a more elegant way to register this listener that was picked up by Hibernate
-        ServiceRegistryImplementor serviceImpl = ((SessionFactoryImplementor)factory).getServiceRegistry();
+
+        // I could not find a more elegant way to register this listener that was picked
+        // up by Hibernate
+        ServiceRegistryImplementor serviceImpl = ((SessionFactoryImplementor) factory).getServiceRegistry();
         EventListenerRegistry eventRegistry = serviceImpl.getService(EventListenerRegistry.class);
         eventRegistry.appendListeners(SAVE_UPDATE, listener);
         eventRegistry.appendListeners(DELETE, listener);
         eventRegistry.appendListeners(MERGE, listener);
-        
+
         return factory;
     }
-    
+
     @Bean
     @Profile("noinit")
     public DataSource primaryDataSource() {
         BridgeConfig config = bridgeConfig();
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClass("com.mysql.cj.jdbc.Driver");
-        dataSource.setJdbcUrl(databaseURL());
-        dataSource.setUser(config.get("hibernate.connection.username"));
-        dataSource.setPassword(config.get("hibernate.connection.password"));
+
+        String url = System.getenv("hibernate.connection.url");
+        if (url == null || url.isEmpty()) {
+            url = databaseURL();
+        }
+        dataSource.setJdbcUrl(url);
+
+        String username = System.getenv("hibernate.connection.username");
+        if (username == null || username.isEmpty()) {
+            username = config.get("hibernate.connection.username");
+        }
+        dataSource.setUser(username);
+
+        String password = System.getenv("hibernate.connection.password");
+        if (password == null || password.isEmpty()) {
+            password = config.get("hibernate.connection.password");
+        }
+        dataSource.setPassword(password);
         return dataSource;
     }
-    
+
     @Bean
     @Profile("default")
-    @LiquibaseDataSource
+    // @LiquibaseDataSource
     public DataSource dataSource() {
-        try {
-            // Explicitly load the driver class
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Failed to load MySQL JDBC Driver", e);
-        }
-        
         BridgeConfig config = bridgeConfig();
-        ComboPooledDataSource dataSource = new ComboPooledDataSource();
-        try {
-            dataSource.setDriverClass("com.mysql.cj.jdbc.Driver"); //loads the jdbc driver
-        } catch (PropertyVetoException e) {
-            e.printStackTrace();
-            // handle exception
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClass("com.mysql.cj.jdbc.Driver");
+
+        String url = System.getenv("hibernate.connection.url");
+        if (url == null || url.isEmpty()) {
+            url = databaseURL();
         }
-        dataSource.setJdbcUrl(databaseURL());
-        dataSource.setUser(config.get("hibernate.connection.username"));
-        dataSource.setPassword(config.get("hibernate.connection.password"));
+        dataSource.setJdbcUrl(url);
+
+        String username = System.getenv("hibernate.connection.username");
+        if (username == null || username.isEmpty()) {
+            username = config.get("hibernate.connection.username");
+        }
+        dataSource.setUser(username);
+
+        String password = System.getenv("hibernate.connection.password");
+        if (password == null || password.isEmpty()) {
+            password = config.get("hibernate.connection.password");
+        }
+        dataSource.setPassword(password);
         return dataSource;
     }
-    
-    // For cases where we have no special exception handling, the basicHibernateHelper
+
+    // For cases where we have no special exception handling, the
+    // basicHibernateHelper
     // is sufficient.
     @Bean(name = "basicHibernateHelper")
     @Autowired
@@ -738,41 +790,41 @@ public class SpringConfig {
             BasicPersistenceExceptionConverter converter) {
         return new HibernateHelper(sessionFactory, converter);
     }
-    
+
     @Bean(name = "accountHibernateHelper")
     @Autowired
     public HibernateHelper accountHibernateHelper(SessionFactory sessionFactory,
             AccountPersistenceExceptionConverter converter) {
         return new HibernateHelper(sessionFactory, converter);
     }
-    
+
     @Bean(name = "sponsorHibernateHelper")
     @Autowired
     public HibernateHelper sponsorHibernateHelper(SessionFactory sessionFactory,
             SponsorPersistenceExceptionConverter converter) {
         return new HibernateHelper(sessionFactory, converter);
     }
-    
+
     @Bean(name = "organizationHibernateHelper")
     @Autowired
     public HibernateHelper organizationHibernateHelper(SessionFactory sessionFactory,
             OrganizationPersistenceExceptionConverter converter) {
         return new HibernateHelper(sessionFactory, converter);
     }
-    
+
     @Bean(name = "mysqlHibernateHelper")
     @Autowired
     public HibernateHelper schedule2HibernateHelper(SessionFactory sessionFactory,
             MySQLHibernatePersistenceExceptionConverter converter) {
         return new HibernateHelper(sessionFactory, converter);
     }
-    
+
     @Bean(name = "sessionExpireInSeconds")
     public int getSessionExpireInSeconds() {
         return BridgeConstants.BRIDGE_SESSION_EXPIRE_IN_SECONDS;
     }
 
-    @Bean(name="bridgePFSynapseClient")
+    @Bean(name = "bridgePFSynapseClient")
     public SynapseClient synapseClient() {
         Config config = bridgeConfig();
         LOG.info("Synapse TKN : %s", config.get("synapse.access.token"));
@@ -782,7 +834,7 @@ public class SpringConfig {
         return synapseClient;
     }
 
-    @Bean(name="exporterSynapseClient")
+    @Bean(name = "exporterSynapseClient")
     public SynapseClient exporterSynapseClient() {
         Config config = bridgeConfig();
         LOG.info("Exporter Synapse TKN : %s", config.get("exporter.synapse.access.token"));
@@ -793,14 +845,15 @@ public class SpringConfig {
     }
 
     private static void setSynapseEndpoint(SynapseClient synapseClient, Config config) {
-        // Based on config, we either talk to Synapse Dev (local/dev/staging) or Synapse Prod.
+        // Based on config, we either talk to Synapse Dev (local/dev/staging) or Synapse
+        // Prod.
         String synapseEndpoint = config.get("synapse.endpoint");
         synapseClient.setAuthEndpoint(synapseEndpoint + "auth/v1");
         synapseClient.setFileEndpoint(synapseEndpoint + "file/v1");
         synapseClient.setRepositoryEndpoint(synapseEndpoint + "repo/v1");
     }
 
-    @Bean(name="exporterSynapseHelper")
+    @Bean(name = "exporterSynapseHelper")
     public SynapseHelper exporterSynapseHelper() {
         SynapseHelper synapseHelper = new SynapseHelper();
         synapseHelper.setSynapseClient(exporterSynapseClient());
@@ -816,7 +869,7 @@ public class SpringConfig {
         cache.setCachePeriod(BridgeConstants.BRIDGE_VIEW_EXPIRE_IN_SECONDS);
         return cache;
     }
-    
+
     @Bean(name = "appLinkViewCache")
     @Autowired
     public ViewCache appLinkViewCache(CacheProvider cacheProvider) {
@@ -826,7 +879,7 @@ public class SpringConfig {
         cache.setCachePeriod(BridgeConstants.APP_LINKS_EXPIRE_IN_SECONDS);
         return cache;
     }
-    
+
     // From BridgeProductionSpringConfig in BridgePF
 
     @Bean(name = "jedisOps")
@@ -849,7 +902,7 @@ public class SpringConfig {
         poolConfig.setTestOnBorrow(true);
         poolConfig.setTestOnReturn(true);
         poolConfig.setTestWhileIdle(true);
-        
+
         final String url = bridgeConfig().get(redisServerProperty);
         final JedisPool jedisPool = constructJedisPool(url, poolConfig);
 
@@ -858,46 +911,46 @@ public class SpringConfig {
 
         return jedisPool;
     }
-    
+
     private JedisPool constructJedisPool(final String url, final JedisPoolConfig poolConfig)
             throws URISyntaxException {
 
         URI redisURI = new URI(url);
         String password = BridgeUtils.extractPasswordFromURI(redisURI);
-        
+
         if (password != null) {
             return new JedisPool(poolConfig, redisURI.getHost(), redisURI.getPort(),
                     bridgeConfig().getPropertyAsInt("redis.timeout"), password);
         }
         return new JedisPool(poolConfig, redisURI.getHost(), redisURI.getPort(),
                 bridgeConfig().getPropertyAsInt("redis.timeout"));
-    }   
-    
+    }
+
     @Bean(name = "defaultSchemaRevisionMap")
-    public Map<String,Map<String,Integer>> defaultSchemaRevisionMap() {
-        return new ImmutableMap.Builder<String,Map<String,Integer>>()
+    public Map<String, Map<String, Integer>> defaultSchemaRevisionMap() {
+        return new ImmutableMap.Builder<String, Map<String, Integer>>()
                 .put("api", ImmutableMap.of(
                         "schema-rev-test", 2))
                 .put("asthma", ImmutableMap.of(
-                        "Air Quality Report", 4, 
+                        "Air Quality Report", 4,
                         "NonIdentifiableDemographicsTask", 2))
                 .put("breastcancer", ImmutableMap.of(
-                        "Journal", 3, 
-                        "My Journal", 3, 
+                        "Journal", 3,
+                        "My Journal", 3,
                         "NonIdentifiableDemographicsTask", 2))
                 .put("cardiovascular", ImmutableMap.of(
-                        "6-Minute Walk Test", 3,  
+                        "6-Minute Walk Test", 3,
                         "2-APHHeartAge-7259AC18-D711-47A6-ADBD-6CFCECDED1DF", 2,
                         "NonIdentifiableDemographicsTask", 2))
                 .put("diabetes", ImmutableMap.of(
-                        "NonIdentifiableDemographicsTask", 2, 
+                        "NonIdentifiableDemographicsTask", 2,
                         "glucoseLogEntryStep", 2))
                 .put("parkinson", ImmutableMap.of(
-                        "NonIdentifiableDemographicsTask", 2, 
-                        "Tapping Activity", 2, 
-                        "Voice Activity", 3, 
+                        "NonIdentifiableDemographicsTask", 2,
+                        "Tapping Activity", 2,
+                        "Voice Activity", 3,
                         "Walking Activity", 5))
                 .build();
     }
-    
+
 }
