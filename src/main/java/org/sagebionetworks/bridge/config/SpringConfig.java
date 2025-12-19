@@ -758,6 +758,7 @@ public class SpringConfig {
     // @LiquibaseDataSource
     public DataSource dataSource() {
         BridgeConfig config = bridgeConfig();
+        // Trigger deploy
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClass("com.mysql.cj.jdbc.Driver");
 
