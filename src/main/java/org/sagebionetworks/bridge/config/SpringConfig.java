@@ -762,7 +762,17 @@ public class SpringConfig {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClass("com.mysql.cj.jdbc.Driver");
 
+        // Explicitly load driver to ensure visibility to C3P0
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
         String url = System.getenv("hibernate.connection.url");
+        if (url == null || url.isEmpty()) {
+            url = System.getenv("HIBERNATE_CONNECTION_URL");
+        }
         if (url == null || url.isEmpty()) {
             url = databaseURL();
         }
@@ -770,11 +780,17 @@ public class SpringConfig {
 
         String username = System.getenv("hibernate.connection.username");
         if (username == null || username.isEmpty()) {
+            username = System.getenv("HIBERNATE_CONNECTION_USERNAME");
+        }
+        if (username == null || username.isEmpty()) {
             username = config.get("hibernate.connection.username");
         }
         dataSource.setUser(username);
 
         String password = System.getenv("hibernate.connection.password");
+        if (password == null || password.isEmpty()) {
+            password = System.getenv("HIBERNATE_CONNECTION_PASSWORD");
+        }
         if (password == null || password.isEmpty()) {
             password = config.get("hibernate.connection.password");
         }
