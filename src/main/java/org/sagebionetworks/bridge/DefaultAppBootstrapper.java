@@ -48,7 +48,7 @@ import org.springframework.stereotype.Component;
  * disable the database migrations that we run through Liquibase.
  */
 @Component
-@Profile("default")
+@Profile({ "default", "noinit" })
 public class DefaultAppBootstrapper implements ApplicationListener<ContextRefreshedEvent> {
 
     /**
