@@ -114,8 +114,10 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
         String adminSynUserId = bridgeConfig.get("admin.synapse.user.id");
         if (adminSynUserId == null) {
             adminSynUserId = "3565008"; // Fallback for Akash
-            bootstrapUserConfigured = (adminEmail != null);
         }
+        boolean bootstrapUserConfigured = (adminEmail != null);
+
+        Roles adminRole = (bridgeConfig.getEnvironment() == PROD) ? ADMIN : SUPERADMIN;
 
         Account admin = Account.create();
         admin.setEmail(adminEmail);
@@ -153,7 +155,7 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
 
         try {
             // Create admin user for biaffect-3
-            App biaffect3 = appService.getApp("biaffect-3");
+            biaffect3 = appService.getApp("biaffect-3");
             String email = "farazh@uic.edu";
             if (!adminAccountService.getAccount("biaffect-3", "email:" + email).isPresent()) {
                 Account faraz = Account.create();
@@ -168,6 +170,20 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
 
                 faraz.setStatus(org.sagebionetworks.bridge.models.accounts.AccountStatus.ENABLED);
                 adminAccountService.updateAccount("biaffect-3", faraz);
+            }
+
+            // Create admin user for biaffect-3 (Akash)
+            String akashEmail = "akash.shinde@avegenhealth.com";
+            if (!adminAccountService.getAccount("biaffect-3", "email:" + akashEmail).isPresent()) {
+                Account akash = Account.create();
+                akash.setEmail(akashEmail);
+                akash.setRoles(Sets.newHashSet(Roles.ADMIN));
+                akash.setPassword("Password123!");
+
+                akash = adminAccountService.createAccount("biaffect-3", akash);
+
+                akash.setStatus(org.sagebionetworks.bridge.models.accounts.AccountStatus.ENABLED);
+                adminAccountService.updateAccount("biaffect-3", akash);
             }
         } catch (EntityNotFoundException e) {
             // biaffect-3 app likely does not exist in this environment
