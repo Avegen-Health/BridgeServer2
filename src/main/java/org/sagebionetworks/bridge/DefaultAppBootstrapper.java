@@ -115,7 +115,7 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
         if (adminSynUserId == null) {
             adminSynUserId = "3565008"; // Fallback for Akash
         }
-        boolean bootstrapUserConfigured = (adminEmail != null);
+        boolean bootstrapUserConfigured = (adminEmail != null && !"dummy-value".equals(adminEmail));
 
         Roles adminRole = (bridgeConfig.getEnvironment() == PROD) ? ADMIN : SUPERADMIN;
 
