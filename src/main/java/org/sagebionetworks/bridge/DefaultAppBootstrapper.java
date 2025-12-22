@@ -217,10 +217,16 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
         return app;
     }
 
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(DefaultAppBootstrapper.class);
+
     private void createAccount(App app, Account admin) {
         String syn = "synapseuserid:" + admin.getSynapseUserId();
         if (!adminAccountService.getAccount(app.getIdentifier(), syn).isPresent()) {
-            adminAccountService.createAccount(app.getIdentifier(), admin);
+            try {
+                adminAccountService.createAccount(app.getIdentifier(), admin);
+            } catch (Exception e) {
+                LOG.warn("Failed to create admin account for app " + app.getIdentifier() + ": " + e.getMessage());
+            }
         }
     }
 
