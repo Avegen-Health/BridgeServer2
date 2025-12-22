@@ -45,25 +45,25 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 public class DefaultAppBootstrapperTest extends Mockito {
-    
+
     @Mock
     BridgeConfig mockConfig;
-    
+
     @Mock
     AdminAccountService mockAdminAccountService;
-    
+
     @Mock
     AccountService mockAccountService;
-    
+
     @Mock
     AppService mockAppService;
-    
+
     @Mock
     DynamoInitializer mockDynamoInitializer;
-    
+
     @Mock
     AnnotationBasedTableCreator mockAnnotationBasedTableCreator;
-    
+
     @Mock
     S3Initializer mockS3Initializer;
 
@@ -81,31 +81,31 @@ public class DefaultAppBootstrapperTest extends Mockito {
 
     @Captor
     ArgumentCaptor<Account> accountCaptor;
-    
+
     @InjectMocks
     DefaultAppBootstrapper bootstrapper;
-    
+
     @BeforeMethod
     public void before() {
         bootstrapper = null; // it keeps this between tests which breaks one test
         MockitoAnnotations.initMocks(this);
     }
-    
+
     @Test
     public void fullBootstrap_withPassword() {
         when(mockConfig.get("admin.email")).thenReturn(EMAIL);
         when(mockConfig.get("admin.password")).thenReturn(PASSWORD);
         when(mockConfig.get("admin.synapse.user.id")).thenReturn(SYNAPSE_USER_ID);
         when(mockConfig.getEnvironment()).thenReturn(Environment.DEV);
-        
-        List<TableDescription> tables = ImmutableList.of(); 
+
+        List<TableDescription> tables = ImmutableList.of();
         when(mockAnnotationBasedTableCreator.getTables("org.sagebionetworks.bridge.dynamodb")).thenReturn(tables);
-        
+
         when(mockAppService.getApp(any())).thenThrow(new EntityNotFoundException(App.class));
         when(mockAppService.createApp(any())).thenAnswer((args) -> args.getArgument(0));
-        
+
         when(mockAccountService.getAccount(any())).thenReturn(Optional.empty());
-        
+
         // We don't care about the context
         bootstrapper.onApplicationEvent(null);
 
@@ -115,7 +115,7 @@ public class DefaultAppBootstrapperTest extends Mockito {
         verify(mockSnsInitializer).initTopics();
 
         verify(mockAppService, times(3)).createApp(appCaptor.capture());
-        
+
         App retApi = appCaptor.getAllValues().get(0);
         assertEquals(retApi.getIdentifier(), API_APP_ID);
         assertFalse(retApi.isReauthenticationEnabled());
@@ -125,7 +125,7 @@ public class DefaultAppBootstrapperTest extends Mockito {
         assertEquals(retApi.getUserProfileAttributes(), ImmutableSet.of("can_be_recontacted"));
         assertTrue(retApi.isEmailVerificationEnabled());
         assertTrue(retApi.isVerifyChannelOnSignInEnabled());
-        
+
         App retApi2 = appCaptor.getAllValues().get(1);
         assertEquals(retApi2.getIdentifier(), API_2_APP_ID);
         assertFalse(retApi2.isReauthenticationEnabled());
@@ -135,18 +135,18 @@ public class DefaultAppBootstrapperTest extends Mockito {
         assertTrue(retApi2.getUserProfileAttributes().isEmpty());
         assertTrue(retApi2.isEmailVerificationEnabled());
         assertTrue(retApi2.isVerifyChannelOnSignInEnabled());
-        
+
         App retShared = appCaptor.getAllValues().get(2);
         assertEquals(retShared.getIdentifier(), SHARED_APP_ID);
         assertFalse(retShared.isReauthenticationEnabled());
         assertEquals(retShared.getMinAgeOfConsent(), 0);
         assertTrue(retShared.isEmailVerificationEnabled());
         assertTrue(retShared.isVerifyChannelOnSignInEnabled());
-        
+
         verify(mockAdminAccountService).createAccount(eq(API_APP_ID), accountCaptor.capture());
         verify(mockAdminAccountService).createAccount(eq(API_2_APP_ID), accountCaptor.capture());
         verify(mockAdminAccountService).createAccount(eq(SHARED_APP_ID), accountCaptor.capture());
-        
+
         assertEquals(accountCaptor.getAllValues().size(), 3);
         for (Account admin : accountCaptor.getAllValues()) {
             assertEquals(admin.getEmail(), EMAIL);
@@ -157,29 +157,29 @@ public class DefaultAppBootstrapperTest extends Mockito {
             assertEquals(admin.getRoles(), ImmutableSet.of(SUPERADMIN));
         }
     }
-    
-    // This is still ok and won't break anything, but 
+
+    // This is still ok and won't break anything, but
     @Test
     public void fullBootstrap_noPassword() {
         when(mockConfig.get("admin.email")).thenReturn(EMAIL);
         when(mockConfig.get("admin.synapse.user.id")).thenReturn(SYNAPSE_USER_ID);
         when(mockConfig.getEnvironment()).thenReturn(Environment.DEV);
-        
-        List<TableDescription> tables = ImmutableList.of(); 
+
+        List<TableDescription> tables = ImmutableList.of();
         when(mockAnnotationBasedTableCreator.getTables("org.sagebionetworks.bridge.dynamodb")).thenReturn(tables);
-        
+
         when(mockAppService.getApp(any())).thenThrow(new EntityNotFoundException(App.class));
         when(mockAppService.createApp(any())).thenAnswer((args) -> args.getArgument(0));
-        
+
         when(mockAccountService.getAccount(any())).thenReturn(Optional.empty());
-        
+
         // We don't care about the context
         bootstrapper.onApplicationEvent(null);
-        
+
         verify(mockAdminAccountService).createAccount(eq(API_APP_ID), accountCaptor.capture());
         verify(mockAdminAccountService).createAccount(eq(API_2_APP_ID), accountCaptor.capture());
         verify(mockAdminAccountService).createAccount(eq(SHARED_APP_ID), accountCaptor.capture());
-        
+
         assertEquals(accountCaptor.getAllValues().size(), 3);
         for (Account admin : accountCaptor.getAllValues()) {
             assertEquals(admin.getEmail(), EMAIL);
@@ -190,24 +190,24 @@ public class DefaultAppBootstrapperTest extends Mockito {
             assertEquals(admin.getRoles(), ImmutableSet.of(SUPERADMIN));
         }
     }
-    
+
     @Test
     public void bootstrapInProd() {
         when(mockConfig.get("admin.email")).thenReturn(EMAIL);
         when(mockConfig.get("admin.synapse.user.id")).thenReturn(SYNAPSE_USER_ID);
         when(mockConfig.getEnvironment()).thenReturn(Environment.PROD);
-        
-        List<TableDescription> tables = ImmutableList.of(); 
+
+        List<TableDescription> tables = ImmutableList.of();
         when(mockAnnotationBasedTableCreator.getTables("org.sagebionetworks.bridge.dynamodb")).thenReturn(tables);
-        
+
         when(mockAppService.getApp(any())).thenThrow(new EntityNotFoundException(App.class));
         when(mockAppService.createApp(any())).thenAnswer((args) -> args.getArgument(0));
-        
+
         when(mockAccountService.getAccount(any())).thenReturn(Optional.empty());
-        
+
         // We don't care about the context
         bootstrapper.onApplicationEvent(null);
-        
+
         verify(mockAdminAccountService).createAccount(eq(API_APP_ID), accountCaptor.capture());
         verify(mockAdminAccountService).createAccount(eq(API_2_APP_ID), accountCaptor.capture());
 
@@ -217,37 +217,41 @@ public class DefaultAppBootstrapperTest extends Mockito {
         Account sharedAdmin = accountCaptor.getAllValues().get(1);
         assertEquals(sharedAdmin.getRoles(), ImmutableSet.of(ADMIN));
     }
-    
+
     @Test
     public void skipExistingItems() {
         when(mockConfig.get("admin.synapse.user.id")).thenReturn(SYNAPSE_USER_ID);
-        
-        List<TableDescription> tables = ImmutableList.of(); 
+
+        List<TableDescription> tables = ImmutableList.of();
         when(mockAnnotationBasedTableCreator.getTables("org.sagebionetworks.bridge.dynamodb")).thenReturn(tables);
-        
+
         when(mockAppService.getApp(any())).thenReturn(App.create());
         when(mockAccountService.getAccount(any())).thenReturn(Optional.of(Account.create()));
-        
+
+        Account existingAccount = Account.create();
+        existingAccount.setRoles(ImmutableSet.of(SUPERADMIN));
+        when(mockAdminAccountService.getAccount(any(), any())).thenReturn(Optional.of(existingAccount));
+
         // We don't care about the context
         bootstrapper.onApplicationEvent(null);
 
         verify(mockAppService, never()).createApp(any());
         verify(mockAdminAccountService, never()).createAccount(any(), any());
     }
-    
+
     @Test
     public void skipBootstrapAccountIfNotConfigured() {
         when(mockConfig.getEnvironment()).thenReturn(Environment.DEV);
-        
-        List<TableDescription> tables = ImmutableList.of(); 
+
+        List<TableDescription> tables = ImmutableList.of();
         when(mockAnnotationBasedTableCreator.getTables("org.sagebionetworks.bridge.dynamodb")).thenReturn(tables);
-        
+
         when(mockAppService.getApp(any())).thenThrow(new EntityNotFoundException(App.class));
         when(mockAppService.createApp(any())).thenAnswer((args) -> args.getArgument(0));
-        
+
         // We don't care about the context
         bootstrapper.onApplicationEvent(null);
-        
+
         verify(mockDynamoInitializer).init(tables);
         verify(mockS3Initializer).initBuckets();
         verify(mockAppService, times(3)).createApp(appCaptor.capture());
