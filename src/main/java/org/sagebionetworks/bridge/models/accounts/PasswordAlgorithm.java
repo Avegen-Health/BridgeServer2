@@ -16,17 +16,22 @@ import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
 import org.sagebionetworks.bridge.BridgeUtils;
 
-/** Password hashing algorithms. Encapsulates methods for generating the hash and checking the hash. */
+/**
+ * Password hashing algorithms. Encapsulates methods for generating the hash and
+ * checking the hash.
+ */
 public enum PasswordAlgorithm {
     /**
-     * Backwards compatible hashing algorithm provided by Stormpath. This does not meet security standards. Do not use
+     * Backwards compatible hashing algorithm provided by Stormpath. This does not
+     * meet security standards. Do not use
      * for new passwords.
      */
     STORMPATH_HMAC_SHA_256 {
         /** {@inheritDoc */
         @Override
         public boolean checkHash(String hash, String plaintext) throws InvalidKeyException, NoSuchAlgorithmException {
-            // Password is in the form "$stormpath1$[base64-encoded salt]$[base64-encoded hashed password]"
+            // Password is in the form "$stormpath1$[base64-encoded salt]$[base64-encoded
+            // hashed password]"
             String[] stormpathHashParts = hash.split("\\$");
             String base64Salt = stormpathHashParts[2];
             byte[] salt = Base64.decodeBase64(base64Salt);
@@ -43,11 +48,13 @@ public enum PasswordAlgorithm {
             byte[] salt = BridgeUtils.generateSalt();
             String base64HashedPassword = hashPasswordWithSalt(plaintext, salt);
 
-            // Password is in the form "$stormpath1$[base64-encoded salt]$[base64-encoded hashed password]"
+            // Password is in the form "$stormpath1$[base64-encoded salt]$[base64-encoded
+            // hashed password]"
             return "$stormpath1$" + Base64.encodeBase64String(salt) + "$" + base64HashedPassword;
         }
 
-        // Helper method that returns the HMAC hash for a plaintext and salt, without encoding the metadata.
+        // Helper method that returns the HMAC hash for a plaintext and salt, without
+        // encoding the metadata.
         private String hashPasswordWithSalt(String plaintext, byte[] salt) throws InvalidKeyException,
                 NoSuchAlgorithmException {
             Mac hmacSha256 = Mac.getInstance("HmacSHA256");
@@ -58,7 +65,8 @@ public enum PasswordAlgorithm {
     },
 
     /**
-     * This is a hack over the insecure Stormpath hashes, where we hash the Stormpath hash with PBKDF2 to make a
+     * This is a hack over the insecure Stormpath hashes, where we hash the
+     * Stormpath hash with PBKDF2 to make a
      * double-hashed password.
      */
     STORMPATH_PBKDF2_DOUBLE_HASH {
@@ -66,7 +74,8 @@ public enum PasswordAlgorithm {
         @Override
         public boolean checkHash(String hash, String plaintext) throws InvalidKeySpecException,
                 InvalidKeyException, NoSuchAlgorithmException {
-            // Password is in the form "[iterations]$[base64-encoded salt]$[base64-encoded hashed password]"
+            // Password is in the form "[iterations]$[base64-encoded salt]$[base64-encoded
+            // hashed password]"
             String[] hashParts = hash.split("\\$");
             int iterations = Integer.parseInt(hashParts[0]);
             String base64Salt = hashParts[1];
@@ -86,13 +95,15 @@ public enum PasswordAlgorithm {
             int iterations = PBKDF2_DEFAULT_ITERATIONS;
             String base64HashedPassword = hashPasswordWithSalt(plaintext, salt, iterations);
 
-            // Output format will be "[iterations]$[base64-encoded salt]$[base64-encoded hashed password]"
+            // Output format will be "[iterations]$[base64-encoded salt]$[base64-encoded
+            // hashed password]"
             return iterations + "$" + Base64.encodeBase64String(salt) + "$" + base64HashedPassword;
         }
 
-        // Helper method to double-hash passwords, first using the Stormpath HMAC, then using PBKDF2.
+        // Helper method to double-hash passwords, first using the Stormpath HMAC, then
+        // using PBKDF2.
         private String hashPasswordWithSalt(String plaintext, byte[] salt, int iterations)
-                throws InvalidKeySpecException, InvalidKeyException, NoSuchAlgorithmException  {
+                throws InvalidKeySpecException, InvalidKeyException, NoSuchAlgorithmException {
             // First, hash the password with the Stormpath algorithm.
             Mac hmacSha256 = Mac.getInstance("HmacSHA256");
             SecretKeySpec secretKey = new SecretKeySpec(salt, "HmacSHA256");
@@ -108,7 +119,10 @@ public enum PasswordAlgorithm {
         }
     },
 
-    /** bcrypt hashing algorithm, which also encodes the salt and the cost in the result. */
+    /**
+     * bcrypt hashing algorithm, which also encodes the salt and the cost in the
+     * result.
+     */
     BCRYPT {
         private static final int DEFAULT_COST = 12;
 
@@ -125,14 +139,22 @@ public enum PasswordAlgorithm {
         }
     },
 
-    /** PBKDF2 hashing algorithm using HMAC SHA 256. Encodes salt and number of iterations in the result. */
+    /**
+     * PBKDF2 hashing algorithm using HMAC SHA 256. Encodes salt and number of
+     * iterations in the result.
+     */
     PBKDF2_HMAC_SHA_256 {
         /** {@inheritDoc */
         @Override
         public boolean checkHash(String hash, String plaintext) throws InvalidKeySpecException,
                 NoSuchAlgorithmException {
-            // Password is in the form "[iterations]$[base64-encoded salt]$[base64-encoded hashed password]"
+            // Password is in the form "[iterations]$[base64-encoded salt]$[base64-encoded
+            // hashed password]"
             String[] hashParts = hash.split("\\$");
+            if (hashParts.length == 1) {
+                // Fallback for hashes using '/' as separator
+                hashParts = hash.split("/");
+            }
             int iterations = Integer.parseInt(hashParts[0]);
             String base64Salt = hashParts[1];
             byte[] salt = Base64.decodeBase64(base64Salt);
@@ -150,11 +172,13 @@ public enum PasswordAlgorithm {
             int iterations = PBKDF2_DEFAULT_ITERATIONS;
             String base64HashedPassword = hashPasswordWithSalt(plaintext, salt, iterations);
 
-            // Output format will be "[iterations]$[base64-encoded salt]$[base64-encoded hashed password]"
+            // Output format will be "[iterations]$[base64-encoded salt]$[base64-encoded
+            // hashed password]"
             return iterations + "$" + Base64.encodeBase64String(salt) + "$" + base64HashedPassword;
         }
 
-        // Generates the password hash for the given plaintext, salt, and number of iterations. Result does not
+        // Generates the password hash for the given plaintext, salt, and number of
+        // iterations. Result does not
         // include the metadata (salt and iterations).
         private String hashPasswordWithSalt(String plaintext, byte[] salt, int iterations)
                 throws InvalidKeySpecException, NoSuchAlgorithmException {
@@ -168,11 +192,17 @@ public enum PasswordAlgorithm {
     public static final PasswordAlgorithm DEFAULT_PASSWORD_ALGORITHM = PBKDF2_HMAC_SHA_256;
     private static final int PBKDF2_DEFAULT_ITERATIONS = 250000;
 
-    /** Given a hash with metadata (such as salt, cost, iterations), check whether the given plaintext matches. */
+    /**
+     * Given a hash with metadata (such as salt, cost, iterations), check whether
+     * the given plaintext matches.
+     */
     public abstract boolean checkHash(String hash, String plaintext) throws InvalidKeySpecException,
             InvalidKeyException, NoSuchAlgorithmException;
 
-    /** Generate a hash with metadata (such as salt, cost, iterations) from the given plaintext. */
+    /**
+     * Generate a hash with metadata (such as salt, cost, iterations) from the given
+     * plaintext.
+     */
     public abstract String generateHash(String plaintext) throws InvalidKeySpecException, InvalidKeyException,
             NoSuchAlgorithmException;
 }
