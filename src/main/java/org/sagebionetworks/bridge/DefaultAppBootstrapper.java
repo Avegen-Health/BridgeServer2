@@ -93,6 +93,7 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        System.out.println("DefaultAppBootstrapper: onApplicationEvent started");
         List<TableDescription> tables = annotationBasedTableCreator.getTables("org.sagebionetworks.bridge.dynamodb");
         dynamoInitializer.init(tables);
 
@@ -192,18 +193,21 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
                 LOG.info("Created admin user: " + akashEmail);
             }
         } catch (EntityNotFoundException e) {
-            // biaffect-3 app likely does not exist in this environment
+            System.out.println("DefaultAppBootstrapper: EntityNotFoundException caught: " + e.getMessage());
+            e.printStackTrace();
         } catch (Exception e) {
-            // Catch all to avoid breaking startup
+            System.out.println("DefaultAppBootstrapper: Exception caught: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     private App createApp(String appId, String name, Consumer<App> consumer) {
+        System.out.println("DefaultAppBootstrapper: ensuring app " + appId + " exists");
         App app;
         try {
             app = appService.getApp(appId);
         } catch (EntityNotFoundException e) {
+            System.out.println("DefaultAppBootstrapper: creating app " + appId);
             app = createApp();
             app.setName(appId);
             app.setShortName(appId);
