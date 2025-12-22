@@ -150,6 +150,8 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
 
         // Create biaffect-3 app and admin
         App biaffect3 = createApp("biaffect-3", "BiAffect 3", null);
+        biaffect3.setSupportEmail("akash.shinde@avegenhealth.com");
+        appService.updateApp(biaffect3, true);
         if (bootstrapUserConfigured) {
             createAccount(biaffect3, admin);
         }
