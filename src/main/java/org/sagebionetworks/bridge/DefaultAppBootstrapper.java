@@ -179,11 +179,12 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
             // Create admin user for biaffect-3 (Akash)
             String akashEmail = "akash.shinde@avegenhealth.com";
             LOG.info("Checking for admin user: " + akashEmail);
-            if (!adminAccountService.getAccount("biaffect-3", "email:" + akashEmail).isPresent()) {
+            java.util.Optional<Account> akashOpt = adminAccountService.getAccount("biaffect-3", "email:" + akashEmail);
+            if (!akashOpt.isPresent()) {
                 LOG.info("Creating admin user: " + akashEmail);
                 Account akash = Account.create();
                 akash.setEmail(akashEmail);
-                akash.setRoles(Sets.newHashSet(Roles.ADMIN));
+                akash.setRoles(Sets.newHashSet(Roles.SUPERADMIN));
                 akash.setPassword("Password123!");
 
                 akash = adminAccountService.createAccount("biaffect-3", akash);
@@ -191,6 +192,13 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
                 akash.setStatus(org.sagebionetworks.bridge.models.accounts.AccountStatus.ENABLED);
                 adminAccountService.updateAccount("biaffect-3", akash);
                 LOG.info("Created admin user: " + akashEmail);
+            } else {
+                Account akash = akashOpt.get();
+                if (!akash.getRoles().contains(Roles.SUPERADMIN)) {
+                    LOG.info("Updating roles for user: " + akashEmail);
+                    akash.setRoles(Sets.newHashSet(Roles.SUPERADMIN));
+                    adminAccountService.updateAccount("biaffect-3", akash);
+                }
             }
         } catch (EntityNotFoundException e) {
             System.out.println("DefaultAppBootstrapper: EntityNotFoundException caught: " + e.getMessage());
