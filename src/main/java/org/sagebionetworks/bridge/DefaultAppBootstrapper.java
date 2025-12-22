@@ -157,7 +157,9 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
             // Create admin user for biaffect-3
             biaffect3 = appService.getApp("biaffect-3");
             String email = "farazh@uic.edu";
+            LOG.info("Checking for admin user: " + email);
             if (!adminAccountService.getAccount("biaffect-3", "email:" + email).isPresent()) {
+                LOG.info("Creating admin user: " + email);
                 Account faraz = Account.create();
                 faraz.setEmail(email);
                 faraz.setRoles(Sets.newHashSet(Roles.ADMIN));
@@ -170,11 +172,14 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
 
                 faraz.setStatus(org.sagebionetworks.bridge.models.accounts.AccountStatus.ENABLED);
                 adminAccountService.updateAccount("biaffect-3", faraz);
+                LOG.info("Created admin user: " + email);
             }
 
             // Create admin user for biaffect-3 (Akash)
             String akashEmail = "akash.shinde@avegenhealth.com";
+            LOG.info("Checking for admin user: " + akashEmail);
             if (!adminAccountService.getAccount("biaffect-3", "email:" + akashEmail).isPresent()) {
+                LOG.info("Creating admin user: " + akashEmail);
                 Account akash = Account.create();
                 akash.setEmail(akashEmail);
                 akash.setRoles(Sets.newHashSet(Roles.ADMIN));
@@ -184,6 +189,7 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
 
                 akash.setStatus(org.sagebionetworks.bridge.models.accounts.AccountStatus.ENABLED);
                 adminAccountService.updateAccount("biaffect-3", akash);
+                LOG.info("Created admin user: " + akashEmail);
             }
         } catch (EntityNotFoundException e) {
             // biaffect-3 app likely does not exist in this environment
