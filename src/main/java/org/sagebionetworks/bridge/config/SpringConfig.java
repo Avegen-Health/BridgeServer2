@@ -775,7 +775,7 @@ public class SpringConfig {
     @Bean(name="bridgePFSynapseClient")
     public SynapseClient synapseClient() {
         Config config = bridgeConfig();
-        LOG.info("Synapse TKN : %s", config.get("synapse.access.token"));
+        //LOG.info("Synapse TKN : %s", config.get("synapse.access.token"));
         SynapseClient synapseClient = new SynapseAdminClientImpl();
         synapseClient.setBearerAuthorizationToken(config.get("synapse.access.token"));
         setSynapseEndpoint(synapseClient, config);
