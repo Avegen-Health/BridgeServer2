@@ -154,7 +154,7 @@ public class DefaultAppBootstrapper implements ApplicationListener<ContextRefres
             Organization org = Organization.create();
             org.setAppId(appId);
             org.setIdentifier(SAGE_ID);
-            org.setName("Sage Bionetworks");
+            org.setName("GRIP Research");
             orgService.createOrganization(org);
         }
         return app;
