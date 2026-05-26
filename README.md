@@ -47,3 +47,4 @@ Useful Spring Boot / Maven development resouces:
 - http://techblog.molindo.at/2007/11/maven-unable-to-find-resources-in-test-cases.html
 
 
+
