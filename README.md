@@ -45,3 +45,4 @@ Useful Spring Boot / Maven development resouces:
 
 - http://stackoverflow.com/questions/27323104/spring-boot-and-maven-exec-plugin-issue<br>
 - http://techblog.molindo.at/2007/11/maven-unable-to-find-resources-in-test-cases.html
+
