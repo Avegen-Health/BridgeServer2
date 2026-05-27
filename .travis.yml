@@ -32,4 +32,4 @@ deploy:
     prod: org-gvbridge-bridgeserver2-deployment-prod
   zip-file: target/BridgeServer2-2.1-SNAPSHOT.war
   on:
-    all_branches: true
+    branch: prod
