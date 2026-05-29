@@ -8,7 +8,7 @@ before_deploy:
   # Bundle WAR + .platform/hooks/ so EB runs the postdeploy hook on each deploy.
   # Deploying just the WAR (the previous behaviour) excludes .platform/ and the hook never runs.
   - mkdir -p /tmp/eb-bundle/.platform/hooks/postdeploy
-  - cp target/BridgeServer2-2.1-SNAPSHOT.war /tmp/eb-bundle/
+  - cp target/BridgeServer2-2.1-SNAPSHOT.war /tmp/eb-bundle/ROOT.war
   - cp .platform/hooks/postdeploy/99_cloudwatch_tomcat.sh /tmp/eb-bundle/.platform/hooks/postdeploy/
   - chmod +x /tmp/eb-bundle/.platform/hooks/postdeploy/99_cloudwatch_tomcat.sh
   - cd /tmp/eb-bundle && zip -r "$TRAVIS_BUILD_DIR/eb-bundle.zip" . && cd -
