@@ -13,6 +13,10 @@ import com.google.common.collect.ImmutableList;
 
 public class BridgeConstants {
     public static final String CONFIG_KEY_WORKER_SQS_URL = "workerPlatform.request.sqs.queue.url";
+    // ADDF export queue URL is resolved from the queue name by SqsInitializer at startup (see SqsInitializer).
+    public static final String CONFIG_KEY_ADDF_SQS_URL = "addf.export.request.sqs.queue.url";
+    // Kill-switch: BS2 enqueues ADDF export requests only when true.
+    public static final String CONFIG_KEY_ADDF_ENABLED = "addf.export.enabled";
     public static final String EXTERNAL_ID_NONE = "<none>";
     
     public static final String CANNOT_BE_BLANK = "%s cannot be null or blank";
