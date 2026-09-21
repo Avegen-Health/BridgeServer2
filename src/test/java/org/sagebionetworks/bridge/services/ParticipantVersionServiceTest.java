@@ -43,6 +43,7 @@ import org.sagebionetworks.bridge.models.demographics.DemographicValue;
 import org.sagebionetworks.bridge.models.studies.Enrollment;
 import org.sagebionetworks.bridge.models.worker.Ex3ParticipantVersionRequest;
 import org.sagebionetworks.bridge.models.worker.WorkerRequest;
+import org.sagebionetworks.bridge.services.addf.AddfParticipantVersionEnqueuer;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -76,6 +77,9 @@ public class ParticipantVersionServiceTest {
                             new DemographicValue("k", "v")),
                     null)));
     private static final String WORKER_QUEUE_URL = "http://example.com/dummy-sqs-url";
+
+    @Mock
+    private AddfParticipantVersionEnqueuer mockAddfParticipantVersionEnqueuer;
 
     @Mock
     private AppService mockAppService;
