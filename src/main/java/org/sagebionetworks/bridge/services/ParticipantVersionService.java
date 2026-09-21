@@ -34,6 +34,7 @@ import org.sagebionetworks.bridge.models.demographics.Demographic;
 import org.sagebionetworks.bridge.models.demographics.DemographicUser;
 import org.sagebionetworks.bridge.models.worker.Ex3ParticipantVersionRequest;
 import org.sagebionetworks.bridge.models.worker.WorkerRequest;
+import org.sagebionetworks.bridge.services.addf.AddfParticipantVersionEnqueuer;
 import org.sagebionetworks.bridge.time.DateUtils;
 
 @Component
@@ -42,11 +43,17 @@ public class ParticipantVersionService {
 
     static final String WORKER_NAME_EX_3_PARTICIPANT_VERSION = "Ex3ParticipantVersionWorker";
 
+    private AddfParticipantVersionEnqueuer addfParticipantVersionEnqueuer;
     private AppService appService;
     private DemographicService demographicService;
     private BridgeConfig config;
     private ParticipantVersionDao participantVersionDao;
     private AmazonSQS sqsClient;
+
+    @Autowired
+    public final void setAddfParticipantVersionEnqueuer(AddfParticipantVersionEnqueuer addfParticipantVersionEnqueuer) {
+        this.addfParticipantVersionEnqueuer = addfParticipantVersionEnqueuer;
+    }
 
     @Autowired
     public final void setAppService(AppService appService) {
@@ -284,6 +291,10 @@ public class ParticipantVersionService {
         SendMessageResult sqsResult = sqsClient.sendMessage(workerQueueUrl, requestJson);
         LOG.info("Sent export participant version request for app " + appId + " healthCode " + healthCode +
                 " version " + versionNum + "; received message ID=" + sqsResult.getMessageId());
+
+        // Fan out to the ADDF export pipeline as an independent sibling of the Exporter 3.0 send above. This is
+        // best-effort and kill-switch gated; it logs and swallows failures so it can never affect the E3 send.
+        addfParticipantVersionEnqueuer.enqueue(appId, healthCode, versionNum);
     }
 
     /** Delete all participant versions for the given health code. This is called by integration tests. */

@@ -110,6 +110,7 @@ import org.sagebionetworks.bridge.models.upload.Upload;
 import org.sagebionetworks.bridge.models.worker.Exporter3Request;
 import org.sagebionetworks.bridge.models.worker.WorkerRequest;
 import org.sagebionetworks.bridge.s3.S3Helper;
+import org.sagebionetworks.bridge.services.addf.AddfExportEnqueuer;
 import org.sagebionetworks.bridge.synapse.SynapseHelper;
 
 public class Exporter3ServiceTest {
@@ -191,6 +192,9 @@ public class Exporter3ServiceTest {
 
     @Mock
     private AccountService mockAccountService;
+
+    @Mock
+    private AddfExportEnqueuer mockAddfExportEnqueuer;
 
     @Mock
     private AppService mockAppService;

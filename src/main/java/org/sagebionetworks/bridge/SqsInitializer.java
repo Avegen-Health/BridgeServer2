@@ -55,6 +55,7 @@ public class SqsInitializer {
             .put("s3.notification.sqs.queue", true)
             .put("virus.scan.result.sqs.queue", true)
             .put("workerPlatform.request.sqs.queue", false)
+            .put("addf.export.request.sqs.queue", false)
             .put("integ.test.sqs.queue", true)
             .build();
 
