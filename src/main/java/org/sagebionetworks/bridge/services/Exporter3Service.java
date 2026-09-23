@@ -89,6 +89,7 @@ import org.sagebionetworks.bridge.models.upload.Upload;
 import org.sagebionetworks.bridge.models.worker.Exporter3Request;
 import org.sagebionetworks.bridge.models.worker.WorkerRequest;
 import org.sagebionetworks.bridge.s3.S3Helper;
+import org.sagebionetworks.bridge.services.addf.AddfExportEnqueuer;
 import org.sagebionetworks.bridge.synapse.SynapseHelper;
 import org.sagebionetworks.bridge.validators.ExportToAppNotificationValidator;
 import org.sagebionetworks.bridge.validators.ExporterSubscriptionRequestValidator;
@@ -273,6 +274,7 @@ public class Exporter3Service {
     private String synapseTrackingViewId;
 
     private AccountService accountService;
+    private AddfExportEnqueuer addfExportEnqueuer;
     private AppService appService;
     private BridgeConfig config;
     private HealthDataEx3Service healthDataEx3Service;
@@ -321,6 +323,11 @@ public class Exporter3Service {
     @Autowired
     public final void setAccountService(AccountService accountService) {
         this.accountService = accountService;
+    }
+
+    @Autowired
+    public final void setAddfExportEnqueuer(AddfExportEnqueuer addfExportEnqueuer) {
+        this.addfExportEnqueuer = addfExportEnqueuer;
     }
 
     @Autowired
@@ -988,6 +995,10 @@ public class Exporter3Service {
         SendMessageResult sqsResult = sqsClient.sendMessage(workerQueueUrl, requestJson);
         LOG.info("Sent export request for app " + appId + " record " + recordId + "; received message ID=" +
                 sqsResult.getMessageId());
+
+        // Fan out to the ADDF export pipeline as an independent sibling of the Exporter 3.0 send above. This is
+        // best-effort and kill-switch gated; it logs and swallows failures so it can never affect the E3 send.
+        addfExportEnqueuer.enqueue(appId, recordId);
     }
 
     // Export timeline from Bridge to Synapse (Some researchers only have access to Synapse, not Bridge,
