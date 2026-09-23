@@ -40,4 +40,6 @@ deploy:
     prod: org-gvbridge-bridgeserver2-deployment-prod
   zip-file: eb-bundle.zip
   on:
-    branch: prod
+    branch:
+    - uat
+    - prod
