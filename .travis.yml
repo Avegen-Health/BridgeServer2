@@ -11,7 +11,21 @@ before_deploy:
   - cp target/BridgeServer2-2.1-SNAPSHOT.war /tmp/eb-bundle/ROOT.war
   - cp .platform/hooks/postdeploy/99_cloudwatch_tomcat.sh /tmp/eb-bundle/.platform/hooks/postdeploy/
   - chmod +x /tmp/eb-bundle/.platform/hooks/postdeploy/99_cloudwatch_tomcat.sh
+  # .ebextensions must sit at the SOURCE BUNDLE root. maven-war-plugin also copies
+  # ebextensions/ to .ebextensions inside the WAR (see pom.xml webResources), but EB
+  # honours that location only when the bundle IS a single bare WAR. This bundle is
+  # multi-file, so without this copy EB applies none of them - silently dropping
+  # waf.config (the WAFv2 WebACL), logrotate, tomcatlogs, tomcat-log-cleanup and
+  # newrelic-server. Confirmed inert on the BridgeWorkerPlatform uat host, which had
+  # already deployed via a bundle.
+  - cp -r ebextensions /tmp/eb-bundle/.ebextensions
   - cd /tmp/eb-bundle && zip -r "$TRAVIS_BUILD_DIR/eb-bundle.zip" . && cd -
+  # Fail loudly if the bundle is ever assembled wrong. Packaging breakages of this
+  # class deploy green and only surface at runtime, because EB reports an environment
+  # healthy as soon as Tomcat starts.
+  - 'unzip -l "$TRAVIS_BUILD_DIR/eb-bundle.zip" | grep -q "ROOT.war" || { echo "BUNDLE ERROR - ROOT.war missing"; exit 1; }'
+  - 'unzip -l "$TRAVIS_BUILD_DIR/eb-bundle.zip" | grep -q ".ebextensions/" || { echo "BUNDLE ERROR - .ebextensions missing"; exit 1; }'
+  - 'unzip -l "$TRAVIS_BUILD_DIR/eb-bundle.zip" | grep -q ".platform/hooks/postdeploy/" || { echo "BUNDLE ERROR - .platform hooks missing"; exit 1; }'
 branches:
   only:
   - develop
