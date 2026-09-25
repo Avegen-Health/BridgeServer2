@@ -1257,6 +1257,10 @@ public class Exporter3ServiceTest {
                 Exporter3Request.class);
         assertEquals(ex3Request.getAppId(), TestConstants.TEST_APP_ID);
         assertEquals(ex3Request.getRecordId(), RECORD_ID);
+
+        // Verify the ADDF fan-out. It is an independent sibling of the Exporter 3.0 send above and carries the same
+        // (appId, recordId); its own kill-switch and failure-swallowing live in AddfExportEnqueuerTest.
+        verify(mockAddfExportEnqueuer).enqueue(TestConstants.TEST_APP_ID, RECORD_ID);
     }
 
     @Test
@@ -1567,6 +1571,10 @@ public class Exporter3ServiceTest {
 
         // No call to SQS.
         verifyZeroInteractions(mockSqsClient);
+
+        // And no ADDF fan-out either: the call sits inside exportUpload, so it inherits the NO_SHARING gate in
+        // completeUpload rather than needing its own consent check (§2.2).
+        verifyZeroInteractions(mockAddfExportEnqueuer);
     }
 
     @Test

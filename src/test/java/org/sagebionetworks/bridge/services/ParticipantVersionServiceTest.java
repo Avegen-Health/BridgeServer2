@@ -310,6 +310,11 @@ public class ParticipantVersionServiceTest {
         assertEquals(participantVersionRequest.getAppId(), TestConstants.TEST_APP_ID);
         assertEquals(participantVersionRequest.getHealthCode(), TestConstants.HEALTH_CODE);
         assertEquals(participantVersionRequest.getParticipantVersion(), 1);
+
+        // Verify the ADDF fan-out. It shadows the Exporter 3.0 send above with the same (appId, healthCode, version) —
+        // that version number is the FK half every activity row resolves against (§3b.5). Kill-switch and
+        // failure-swallowing behaviour is covered in AddfParticipantVersionEnqueuerTest.
+        verify(mockAddfParticipantVersionEnqueuer).enqueue(TestConstants.TEST_APP_ID, TestConstants.HEALTH_CODE, 1);
     }
 
     @Test
