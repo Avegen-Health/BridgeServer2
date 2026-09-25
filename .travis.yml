@@ -11,7 +11,61 @@ before_deploy:
   - cp target/BridgeServer2-2.1-SNAPSHOT.war /tmp/eb-bundle/ROOT.war
   - cp .platform/hooks/postdeploy/99_cloudwatch_tomcat.sh /tmp/eb-bundle/.platform/hooks/postdeploy/
   - chmod +x /tmp/eb-bundle/.platform/hooks/postdeploy/99_cloudwatch_tomcat.sh
+  # .ebextensions must sit at the SOURCE BUNDLE root. maven-war-plugin also copies
+  # ebextensions/ to .ebextensions inside the WAR (see pom.xml webResources), but EB
+  # honours that location only when the bundle IS a single bare WAR. This bundle is
+  # multi-file, so without this copy EB applies none of them - silently dropping
+  # waf.config (the WAFv2 WebACL), logrotate, tomcatlogs, tomcat-log-cleanup and
+  # newrelic-server. Confirmed inert on the BridgeWorkerPlatform uat host, which had
+  # already deployed via a bundle.
+  #
+  # SHIPPED SELECTIVELY, ON PURPOSE - and the two categories differ in kind, not just risk:
+  #
+  #   waf.config is a `Resources:` block, i.e. DECLARATIVE CloudFormation. EB regenerates the
+  #   environment's CFN template from the shipped ebextensions on every deploy, so omitting it
+  #   does not merely skip re-creating the WebACL - CFN DELETES it. That is the whole reason
+  #   this change exists, so it ships first and must never be dropped from this list.
+  #
+  #   The rest are imperative (files:/commands:/container_commands:). Omitting one leaves what
+  #   it already wrote in place; it simply is not re-applied. A non-zero exit from any of their
+  #   commands, however, FAILS THE DEPLOY. So the two below are deferred, each to a change that
+  #   also fixes its own defects, rather than ridden in on the deploy that restores the WAF:
+  #
+  #   tomcatlogs.config - points LEGACY awslogs at /var/log/tomcat/catalina.out with
+  #     log_group /aws/elasticbeanstalk/<env>/var/log/tomcat/catalina.out and log_stream
+  #     {instance_id}. The postdeploy hook above already streams that same file to the SAME
+  #     group and the SAME stream via the CloudWatch Agent. Two agents on one log stream fight
+  #     over sequence tokens; this is the likeliest cause of the awslogsd crash-loop observed
+  #     on the BridgeWorkerPlatform host. Its '02c service awslogsd restart' and '03 systemctl
+  #     restart rsyslog' also carry no ignoreErrors (unlike 01/02a/02b, which do - the
+  #     asymmetry looks accidental), so restarting a unit in a start-limit state fails the
+  #     deploy. Known gap while deferred: it is also the only streamer of /var/log/eb-activity.log,
+  #     which the hook does not collect. Fix by dropping the duplicate catalina.out stanza and
+  #     moving eb-activity.log to the hook, not by re-adding this file as-is.
+  #   newrelic-server.config - 16 container_commands, not one with ignoreErrors. '09StartMonitor'
+  #     runs /etc/init.d/newrelic-sysmond BEFORE '15CreateInitDirectoryBug' creates /etc/rc.d/init.d
+  #     (commands run in lexical order), it installs the EOL nrsysmond agent, and it pulls an el5
+  #     RPM over plain HTTP. '13' uses curl without -f, so the day that URL 404s it writes the
+  #     error page into /etc/yum.repos.d/ and exits 0, guaranteeing '14' fails.
+  #     (Checked: '03CopyNRApmAgent' hardcodes newrelic-agent-8.21.0.jar and pom.xml is 8.21.0,
+  #     so that particular path is NOT currently broken - it is the rest that is.)
+  - mkdir -p /tmp/eb-bundle/.ebextensions
+  - cp ebextensions/waf.config /tmp/eb-bundle/.ebextensions/
+  - cp ebextensions/logrotate.config /tmp/eb-bundle/.ebextensions/
+  - cp ebextensions/tomcat-log-cleanup.config /tmp/eb-bundle/.ebextensions/
   - cd /tmp/eb-bundle && zip -r "$TRAVIS_BUILD_DIR/eb-bundle.zip" . && cd -
+  # Fail loudly if the bundle is ever assembled wrong. Packaging breakages of this
+  # class deploy green and only surface at runtime, because EB reports an environment
+  # healthy as soon as Tomcat starts. Paths are grepped with -F and a leading space so
+  # the '.' stays a literal and the match is against the unzip listing's path column.
+  - 'unzip -l "$TRAVIS_BUILD_DIR/eb-bundle.zip" | grep -qF " ROOT.war" || { echo "BUNDLE ERROR - ROOT.war missing"; exit 1; }'
+  - 'unzip -l "$TRAVIS_BUILD_DIR/eb-bundle.zip" | grep -qF " .ebextensions/waf.config" || { echo "BUNDLE ERROR - waf.config missing; deploying without it DELETES the WAFv2 WebACL from this internet-facing environment"; exit 1; }'
+  - 'unzip -l "$TRAVIS_BUILD_DIR/eb-bundle.zip" | grep -qF " .platform/hooks/postdeploy/99_cloudwatch_tomcat.sh" || { echo "BUNDLE ERROR - .platform postdeploy hook missing"; exit 1; }'
+  # Guard the deferral above: a future blanket "cp -r ebextensions" would silently re-arm the
+  # two configs that can fail a deploy. Re-adding them should be a deliberate change that also
+  # fixes the defects listed above, not a side effect of tidying this block.
+  - 'unzip -l "$TRAVIS_BUILD_DIR/eb-bundle.zip" | grep -qF " .ebextensions/tomcatlogs.config" && { echo "BUNDLE ERROR - tomcatlogs.config is deferred (duplicates the CloudWatch Agent stream; awslogs restart has no ignoreErrors)"; exit 1; }; true'
+  - 'unzip -l "$TRAVIS_BUILD_DIR/eb-bundle.zip" | grep -qF " .ebextensions/newrelic-server.config" && { echo "BUNDLE ERROR - newrelic-server.config is deferred (16 container_commands, none with ignoreErrors)"; exit 1; }; true'
 branches:
   only:
   - develop
